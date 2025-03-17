@@ -19,6 +19,6 @@ export default function RootLayout() {
                     options={{ presentation: "modal" }}
                 />
             </Stack>
-        </AuthProvider> ddd
+        </AuthProvider>
     );
 }
