@@ -1,22 +1,32 @@
-import { Stack } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { Stack } from "expo-router";
+import { FlatList } from "react-native";
 
-import { ScreenContent } from '~/components/ScreenContent';
+import RoutineListItem from "~/components/RoutineListItem";
+import { supabase } from "~/utils/supabase";
+import { useEffect, useState } from "react";
 
-export default function Home() {
-  return (
-    <>
-      <Stack.Screen options={{ title: 'Home' }} />
-      <View style={styles.container}>
-        <ScreenContent path="app/(tabs)/index.tsx" title="Tab One" />
-      </View>
-    </>
-  );
+export default function Events() {
+    const [routines, setRoutines] = useState([]);
+
+    useEffect(() => {
+        fetchRoutines();
+    }, []);
+
+    const fetchRoutines = async () => {
+        const { data, error } = await supabase
+            .from("routines")
+            .select("*");
+        setRoutines(data);
+    };
+    return (
+        <>
+            <Stack.Screen options={{ title: "Events" }} />
+
+            <FlatList
+                className="bg-white"
+                data={routines}
+                renderItem={({ item }) => <RoutineListItem routine={item} />}
+            />
+        </>
+    );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-  },
-});
