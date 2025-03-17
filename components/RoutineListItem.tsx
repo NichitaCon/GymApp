@@ -6,26 +6,15 @@ import { supabase } from '~/utils/supabase';
 
 export default function RoutineListItem({ routine }) {
     return (
-        <Link href={`/routine/${routine.id}`} asChild>
-            <Pressable className="gap-3 p-3 border-b border-gray-200">
+        <Link href={`/${routine.id}`} asChild>
+            <Pressable className="p-4 mb-3 border rounded-xl border-gray-200 bg-gray-100">
                 <View className="flex-row">
                     <View className="flex-1 gap-1">
-                        <Text className="text-xl font-bold" numberOfLines={2}>
+                        <Text className="text-2xl" numberOfLines={2}>
                             {routine.name} {/* Displaying routine name */}
                         </Text>
-                        <Text className="text-gray-700">{routine.description}</Text> {/* Displaying routine description */}
-                        {routine.is_private ? (
-                            <Text className="text-red-500">Private</Text>
-                        ) : (
-                            <Text className="text-green-500">Public</Text>
-                        )}
-                        <Text className="text-gray-500">Created on {new Date(routine.created_at).toLocaleDateString()}</Text> {/* Displaying created date */}
+                        {/* <Text className="text-gray-700">{routine.description}</Text> Displaying routine description */}
                     </View>
-                </View>
-
-                <View className="flex-row gap-3">
-                    <Feather name="bookmark" size={24} color="gray" />
-                    <Feather name="share" size={24} color="gray" />
                 </View>
             </Pressable>
         </Link>

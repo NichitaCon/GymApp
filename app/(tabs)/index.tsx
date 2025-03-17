@@ -23,7 +23,7 @@ export default function Events() {
             <Stack.Screen options={{ title: "Events" }} />
 
             <FlatList
-                className="bg-white"
+                className="bg-white p-5"
                 data={routines}
                 renderItem={({ item }) => <RoutineListItem routine={item} />}
             />
