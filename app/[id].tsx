@@ -1,5 +1,12 @@
 import { useLocalSearchParams, Stack, Link } from "expo-router";
-import { View, Text, Image, Pressable, ActivityIndicator } from "react-native";
+import {
+    View,
+    Text,
+    Image,
+    Pressable,
+    ActivityIndicator,
+    FlatList,
+} from "react-native";
 
 import { supabase } from "~/utils/supabase";
 import { useEffect, useState } from "react";
@@ -17,9 +24,6 @@ export default function RoutinePage() {
 
     useEffect(() => {
         fetchRoutine();
-    }, [id]);
-
-    useEffect(() => {
         fetchRoutineExercise();
     }, [id]);
 
@@ -32,8 +36,8 @@ export default function RoutinePage() {
             .single();
         setRoutine(data);
         setLoading(false);
-        // console.log("data/routine = ", data);
-        // console.log("id = ", id);
+        console.log("data/routine = ", data);
+        console.log("id = ", id);
     };
 
     const fetchRoutineExercise = async () => {
@@ -41,9 +45,9 @@ export default function RoutinePage() {
         const { data, error } = await supabase
             .from("routine_exercises")
             .select("*")
-            .eq("routine_id", id)
-            // .single();
-        setRoutine(data);
+            .eq("routine_id", id);
+        // .single();
+        setRoutineExercise(data);
         setLoading(false);
         console.log("routineExercises = ", data);
         console.log("id = ", id);
@@ -67,19 +71,28 @@ export default function RoutinePage() {
                 }}
             />
 
-            <Link href={`/${routine.routine_id}`} asChild>
+            {/* <Link href={`/${routine.routine_id}`} asChild>
                 <Pressable className="p-4 mb-3 border rounded-xl border-gray-200 bg-gray-100">
                     <View className="flex-row">
                         <View className="flex-1 gap-1">
                             <Text className="text-2xl" numberOfLines={2}>
-                                {routine.name}, {routine.routine_id}{" "}
-                                {/* Displaying routine name */}
+                                {routine.name}, {routine.routine_id}
                             </Text>
-                            {/* <Text className="text-gray-700">{routine.description}</Text> Displaying routine description */}
                         </View>
                     </View>
                 </Pressable>
-            </Link>
+            </Link> 
+            */} 
+
+            <FlatList
+                data={routineExercise}
+                renderItem={({ item }) => (
+                    <View className="p-2">
+                        <Text>Routine ID: {item.routine_id}</Text>
+                        <Text>Exercise ID: {item.exercise_id}</Text>
+                    </View>
+                )}
+            />
         </View>
     );
 }
