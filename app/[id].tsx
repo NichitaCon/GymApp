@@ -1,4 +1,4 @@
-import { useLocalSearchParams, Stack } from "expo-router";
+import { useLocalSearchParams, Stack, Link } from "expo-router";
 import { View, Text, Image, Pressable, ActivityIndicator } from "react-native";
 
 import { supabase } from "~/utils/supabase";
@@ -10,12 +10,17 @@ export default function RoutinePage() {
     // console.log("id = ",id);
 
     const [routine, setRoutine] = useState(null);
+    const [routineExercise, setRoutineExercise] = useState(null);
     const [loading, setLoading] = useState(false);
 
     const { user } = useAuth();
 
     useEffect(() => {
         fetchRoutine();
+    }, [id]);
+
+    useEffect(() => {
+        fetchRoutineExercise();
     }, [id]);
 
     const fetchRoutine = async () => {
@@ -27,14 +32,25 @@ export default function RoutinePage() {
             .single();
         setRoutine(data);
         setLoading(false);
-        console.log("data/routine = ",data)
-        console.log("id = ",id)
-
+        // console.log("data/routine = ", data);
+        // console.log("id = ", id);
     };
 
+    const fetchRoutineExercise = async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+            .from("routine_exercises")
+            .select("*")
+            .eq("routine_id", id)
+            // .single();
+        setRoutine(data);
+        setLoading(false);
+        console.log("routineExercises = ", data);
+        console.log("id = ", id);
+    };
 
     if (loading) {
-        // return <ActivityIndicator />;
+        return <ActivityIndicator />;
     }
 
     if (!routine) {
@@ -51,29 +67,19 @@ export default function RoutinePage() {
                 }}
             />
 
-
-            <Text className="text-4xl font-bold" numberOfLines={2}>
-                 hi
-            </Text>
-
-
-            {/* Footer */}
-            {/* <View className="absolute bottom-0 left-0 right-0 pb-10 p-5 border-t-2 border-gray-100 flex-row justify-between items-center">
-                <Text className="text-xl font-semibold">Free</Text>
-
-                {attendance ? (
-                    <Text className="font-bold p-4 px-10 border-2 border-blue-300 rounded-md">You're attending!</Text>
-                ) : (
-                    <Pressable
-                        className="p-4 px-10 bg-red-400 rounded-md"
-                        onPress={() => joinEvent()}
-                    >
-                        <Text className="font-bold text-white text-lg">
-                            Join and RSVP
-                        </Text>
-                    </Pressable>
-                )}
-            </View> */}
+            <Link href={`/${routine.routine_id}`} asChild>
+                <Pressable className="p-4 mb-3 border rounded-xl border-gray-200 bg-gray-100">
+                    <View className="flex-row">
+                        <View className="flex-1 gap-1">
+                            <Text className="text-2xl" numberOfLines={2}>
+                                {routine.name}, {routine.routine_id}{" "}
+                                {/* Displaying routine name */}
+                            </Text>
+                            {/* <Text className="text-gray-700">{routine.description}</Text> Displaying routine description */}
+                        </View>
+                    </View>
+                </Pressable>
+            </Link>
         </View>
     );
 }
