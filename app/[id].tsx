@@ -14,9 +14,10 @@ import { useAuth } from "~/contexts/AuthProvider";
 
 export default function RoutinePage() {
     const { id } = useLocalSearchParams();
-    // console.log("id = ",id);
+
 
     const [routine, setRoutine] = useState(null);
+    const [exercise, setExercise] = useState(null);
     const [routineExercise, setRoutineExercise] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -25,6 +26,7 @@ export default function RoutinePage() {
     useEffect(() => {
         fetchRoutine();
         fetchRoutineExercise();
+        fetchExercise();
     }, [id]);
 
     const fetchRoutine = async () => {
@@ -49,9 +51,21 @@ export default function RoutinePage() {
         // .single();
         setRoutineExercise(data);
         setLoading(false);
-        console.log("routineExercises = ", data);
         console.log("id = ", id);
     };
+
+    const fetchExercise = async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+            .from("exercises")
+            .select("*")
+            // .eq("exercise_id", id);
+        // .single();
+        setExercise(data);
+        setLoading(false);
+        console.log("exercise = ", data);
+    };
+    console.log("routineExercises = ", routineExercise);
 
     if (loading) {
         return <ActivityIndicator />;
