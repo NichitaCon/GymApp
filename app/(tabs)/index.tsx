@@ -26,7 +26,7 @@ export default function Events() {
     };
     return (
         <>
-            <Stack.Screen options={{ title: "Events" }} />
+            <Stack.Screen options={{ title: "Home" }} />
 
             <FlatList
                 className="bg-white p-5"

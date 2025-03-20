@@ -6,7 +6,7 @@ import { supabase } from '~/utils/supabase';
 
 export default function RoutineListItem({ routine }) {
     return (
-        <Link href={`/${routine.routine_id}`} asChild>
+        <Link href={`/routine/${routine.routine_id}`} asChild>
             <Pressable className="p-4 mb-3 border rounded-xl border-gray-200 bg-gray-100">
                 <View className="flex-row">
                     <View className="flex-1 gap-1">

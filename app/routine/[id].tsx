@@ -11,6 +11,8 @@ import {
 import { supabase } from "~/utils/supabase";
 import { useEffect, useState } from "react";
 import { useAuth } from "~/contexts/AuthProvider";
+import RoutineListItem from "~/components/RoutineListItem";
+import ExerciseListItem from "~/components/ExerciseListItem";
 
 export default function RoutinePage() {
     const { id } = useLocalSearchParams();
@@ -40,6 +42,7 @@ export default function RoutinePage() {
         setLoading(false);
         // console.log("data/routine = ", data);
         // console.log("id = ", id);
+        setLoading(false);
     };
 
     const fetchRoutineExercise = async () => {
@@ -50,8 +53,7 @@ export default function RoutinePage() {
             .eq("routine_id", id);
         // .single();
         setRoutineExercise(data);
-        setExerciseId(data.exercise_id)
-        console.log("fetchroutineLOG = ", data.select("exercise_id"))
+        setExerciseId(data)
         setLoading(false);
         // console.log("id = ", id);
     };
@@ -59,22 +61,21 @@ export default function RoutinePage() {
     const fetchExercise = async () => {
         const { data, error } = await supabase
             .from("routine_exercises")
-            .select("exercise_id, exercises(name)") // Fetch exercise name
+            .select("exercise_id, exercises(*)") // Fetch exercise name
             .eq("routine_id", id);
     
         if (error) {
             console.error("Error fetching exercises:", error);
             return;
         }
-        console.log("fetchexercise from routinerxercise = ",data)
+        // console.log("fetchexercise from routinerxercise = ",data)
     
         setExercise(data);
     };
 
 
-    console.log("fetchexercise from routinerxercise = ",exercise)
-    // console.log("exercise id = ",exerciseId)
-    // console.log("routineExercises = ", routineExercise);
+    // console.log("fetchexercise from routinerxercise = ",exercise)
+
 
     if (loading) {
         return <ActivityIndicator />;
@@ -83,8 +84,6 @@ export default function RoutinePage() {
     if (!routine) {
         return <Text>routine not found</Text>;
     }
-
-    console.log(exercise[1].exercises.name)
 
     return (
         <View className="flex-1 p-3 gap-3 bg-white">
@@ -95,21 +94,9 @@ export default function RoutinePage() {
                     headerBackTitle: "Home",
                 }}
             />
-
-            {/* <Link href={`/${routine.routine_id}`} asChild>
-                <Pressable className="p-4 mb-3 border rounded-xl border-gray-200 bg-gray-100">
-                    <View className="flex-row">
-                        <View className="flex-1 gap-1">
-                                <Text className="text-2xl" numberOfLines={2}>
-                                Routine name {routine.name}, {routine.routine_id}
-                                </Text>
-                        </View>
-                    </View>
-                </Pressable>
-            </Link>  */}
             
 
-            <FlatList
+            {/* <FlatList
                 data={exercise}
                 renderItem={({ item }) => (
                     <View className="p-2">
@@ -117,6 +104,12 @@ export default function RoutinePage() {
                         <Text>Exercise ID: {item.exercises.name}</Text>
                     </View>
                 )}
+            /> */}
+
+            <FlatList
+                className="bg-white p-1"
+                data={exercise}
+                renderItem={({ item }) => <ExerciseListItem exercise={item} />}
             />
         </View>
     );
