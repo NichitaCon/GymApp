@@ -1,17 +1,32 @@
 import { Stack } from "expo-router";
-import { FlatList } from "react-native";
+import {
+    FlatList,
+    View,
+    Text,
+    Pressable,
+    Modal,
+    Button,
+    TextInput,
+} from "react-native";
 
 import RoutineListItem from "~/components/RoutineListItem";
 import { supabase } from "~/utils/supabase";
 import { useEffect, useState } from "react";
 import { useAuth } from "~/contexts/AuthProvider";
 
+import Entypo from "@expo/vector-icons/Entypo";
+
 export default function Events() {
     const [routines, setRoutines] = useState([]);
-    const {session} = useAuth();
+    const { session, user } = useAuth();
     // console.log("id = ",id);
     // console.log("session user = ", session.user.id)
     // console.log(useAuth())
+
+    const [modalVisible, setModalVisible] = useState(true); // state to control modal visibility
+
+    const [name, setName] = useState(null);
+    const [description, setDescription] = useState(null);
 
     useEffect(() => {
         fetchRoutines();
@@ -24,15 +39,93 @@ export default function Events() {
             .eq("user_id", session.user.id);
         setRoutines(data);
     };
+
+    const createRoutine = async () => {
+        console.log(name, description);
+        const { data, error } = await supabase
+            .from("routines")
+            .insert([
+                {
+                    user_id: user.id,
+                    name: name,
+                    description: description,
+                },
+            ])
+            .select();
+        console.log(data);
+        console.log(error);
+    };
     return (
-        <>
+        <View className="flex-1 bg-white p-5">
             <Stack.Screen options={{ title: "Home" }} />
 
+            <View className="flex-row justify-between items-center mb-4">
+                <Text className="text-5xl">Workouts</Text>
+                <Pressable onPress={() => setModalVisible(true)}>
+                    <Entypo
+                        name="plus"
+                        size={24}
+                        color="black"
+                        className="bg-blue-400 p-3 rounded-full"
+                    />
+                </Pressable>
+            </View>
+
             <FlatList
-                className="bg-white p-5"
+                className="bg-white"
                 data={routines}
                 renderItem={({ item }) => <RoutineListItem routine={item} />}
             />
-        </>
+
+            <Modal
+                animationType="slide"
+                transparent={true} // Modal background is transparent
+                visible={modalVisible}
+            >
+                <View className="flex-auto justify-end items-center bg-black/20 backdrop-blur-xl">
+                    <View className="bg-white p-6 rounded-lg w-full h-screen-safe">
+                        <Text className="text-4xl mb-5 text-center">Add a Workout</Text>
+
+                        <Text className="text-xl mb-1">Workout</Text>
+                        <TextInput
+                            value={name}
+                            onChangeText={(text) => setName(text)}
+                            placeholder="Workout Name"
+                            placeholderTextColor="gray"
+                            className="mb-4 p-3 rounded-lg bg-gray-200"
+                        />
+
+                        <Text className="text-xl mb-1">Description</Text>
+                        <TextInput
+                            value={description}
+                            onChangeText={(text) => setDescription(text)}
+                            placeholder="Description"
+                            placeholderTextColor="gray"
+                            className="mb-4 p-3 rounded-lg bg-gray-200"
+                        />
+
+                        <View className="flex-row justify-between">
+                            <Pressable
+                                className="p-3 px-4 rounded-lg bg-gray-200"
+                                onPress={() => {
+                                    setModalVisible(false);
+                                }}
+                            >
+                                <Text className="text-xl">cancel</Text>
+                            </Pressable>
+                            <Pressable
+                                className="p-3 px-4 rounded-lg bg-gray-200"
+                                onPress={() => {
+                                    createRoutine();
+                                    setModalVisible(false);
+                                }}
+                            >
+                                <Text className="text-xl">Save</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+        </View>
     );
 }
