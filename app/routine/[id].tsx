@@ -109,7 +109,8 @@ export default function RoutinePage() {
             <FlatList
                 className="bg-white p-1"
                 data={exercise}
-                renderItem={({ item }) => <ExerciseListItem exercise={item} />}
+                renderItem={({ item }) => <ExerciseListItem exercise={item}
+                routineId={id} />}
             />
         </View>
     );
