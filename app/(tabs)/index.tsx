@@ -23,7 +23,7 @@ export default function Events() {
     // console.log("session user = ", session.user.id)
     // console.log(useAuth())
 
-    const [modalVisible, setModalVisible] = useState(true); // state to control modal visibility
+    const [modalVisible, setModalVisible] = useState(false); // state to control modal visibility
 
     const [name, setName] = useState(null);
     const [description, setDescription] = useState(null);
@@ -82,9 +82,21 @@ export default function Events() {
                 transparent={true} // Modal background is transparent
                 visible={modalVisible}
             >
-                <View className="flex-auto justify-end items-center bg-black/20 backdrop-blur-xl">
-                    <View className="bg-white p-6 rounded-lg w-full h-screen-safe">
-                        <Text className="text-4xl mb-5 text-center">Add a Workout</Text>
+                <Pressable
+                    onPress={() => {
+                        setModalVisible(false);
+                    }}
+                    className="flex-auto justify-end items-center bg-black/20 backdrop-blur-xl"
+                >
+                    <Pressable
+                        onPress={() => {
+                            setModalVisible(true);
+                        }}
+                        className="bg-white p-6 rounded-lg w-full h-5/6"
+                    >
+                        <Text className="text-4xl mb-5 text-center">
+                            Add a Workout
+                        </Text>
 
                         <Text className="text-xl mb-1">Workout</Text>
                         <TextInput
@@ -123,8 +135,8 @@ export default function Events() {
                                 <Text className="text-xl">Save</Text>
                             </Pressable>
                         </View>
-                    </View>
-                </View>
+                    </Pressable>
+                </Pressable>
             </Modal>
         </View>
     );

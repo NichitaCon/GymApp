@@ -6,6 +6,8 @@ import {
     Pressable,
     ActivityIndicator,
     FlatList,
+    Modal,
+    TextInput,
 } from "react-native";
 
 import { supabase } from "~/utils/supabase";
@@ -13,6 +15,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "~/contexts/AuthProvider";
 import RoutineListItem from "~/components/RoutineListItem";
 import ExerciseListItem from "~/components/ExerciseListItem";
+import Entypo from "@expo/vector-icons/Entypo";
 
 export default function RoutinePage() {
     const { id } = useLocalSearchParams();
@@ -20,8 +23,11 @@ export default function RoutinePage() {
 
     const [routine, setRoutine] = useState(null);
     const [exercise, setExercise] = useState(null);
+
     const [routineExercise, setRoutineExercise] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    const [modalVisible, setModalVisible] = useState(false);
 
     const { user } = useAuth();
 
@@ -53,9 +59,9 @@ export default function RoutinePage() {
             .eq("routine_id", id);
         // .single();
         setRoutineExercise(data);
-        setExerciseId(data)
+        setExerciseId(data);
         setLoading(false);
-        // console.log("id = ", id);
+        // console.log("id = ", data, error);
     };
 
     const fetchExercise = async () => {
@@ -63,19 +69,19 @@ export default function RoutinePage() {
             .from("routine_exercises")
             .select("exercise_id, exercises(*)") // Fetch exercise name
             .eq("routine_id", id);
-    
+
         if (error) {
             console.error("Error fetching exercises:", error);
             return;
         }
         // console.log("fetchexercise from routinerxercise = ",data)
-    
+
         setExercise(data);
     };
 
 
-    // console.log("fetchexercise from routinerxercise = ",exercise)
 
+    // console.log("fetchexercise from routinerxercise = ",exercise)
 
     if (loading) {
         return <ActivityIndicator />;
@@ -94,7 +100,6 @@ export default function RoutinePage() {
                     headerBackTitle: "Home",
                 }}
             />
-            
 
             {/* <FlatList
                 data={exercise}
@@ -109,9 +114,21 @@ export default function RoutinePage() {
             <FlatList
                 className="bg-white p-1"
                 data={exercise}
-                renderItem={({ item }) => <ExerciseListItem exercise={item}
-                routineId={id} />}
+                renderItem={({ item }) => (
+                    <ExerciseListItem exercise={item} routineId={id} />
+                )}
             />
+            <Link
+                href={`/exercise/exercises?routineId=${id}`}
+                asChild
+            >
+                <Pressable onPress={() => setModalVisible(true)}>
+                    <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl">
+                        Add Exercises
+                    </Text>
+                </Pressable>
+            </Link>
+
         </View>
     );
 }
