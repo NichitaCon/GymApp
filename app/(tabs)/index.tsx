@@ -30,7 +30,7 @@ export default function Events() {
 
     useEffect(() => {
         fetchRoutines();
-    }, []);
+    });
 
     const fetchRoutines = async () => {
         const { data, error } = await supabase
