@@ -12,20 +12,21 @@ import { supabase } from "~/utils/supabase";
 
 export default function Exercises() {
     const { routineId } = useLocalSearchParams();
-    
+
     const [allExercises, setAllExercises] = useState([]);
     const [routineExercises, setRoutineExercises] = useState([]);
     const [selectedExercises, setSelectedExercises] = useState<number[]>([]);
-    
+
     useEffect(() => {
         fetchAllExercises();
         fetchRoutineExercises();
+        // updateRoutineExercises();
     }, [routineId]);
-    
+
     // console.log("exerciseObjArray = ",exerciseObjArray)
     // console.log("Routine id exercises.tsx = ", routineId);
     console.log("selected exercises = ", selectedExercises);
-    
+
     const toggleExerciseSelection = (exerciseId: number) => {
         setSelectedExercises(
             (prev) =>
@@ -56,19 +57,22 @@ export default function Exercises() {
         const { data, error } = await supabase
             .from("routine_exercises")
             .select("*")
-            .eq("routine_id", routineId)
+            .eq("routine_id", routineId);
 
-            if (error) {
-                console.error("Error reading exercises in routine_exercises: ", error);
-                return;
-            } else if (!data || data.length === 0) {
-                console.warn("Exercises from routine_exercises are empty.");
-            } else {
-                setRoutineExercises(data);
-                setSelectedExercises(data.map((exercise) => exercise.exercise_id));
-                // console.log("Exercises from routine_exercises: ", data);
-            }
-    }
+        if (error) {
+            console.error(
+                "Error reading exercises in routine_exercises: ",
+                error,
+            );
+            return;
+        } else if (!data || data.length === 0) {
+            console.warn("Exercises from routine_exercises are empty.");
+        } else {
+            setRoutineExercises(data);
+            setSelectedExercises(data.map((exercise) => exercise.exercise_id));
+            // console.log("Exercises from routine_exercises: ", data);
+        }
+    };
 
     const createRoutineExercises = async () => {
         console.log("create routine exercise CALLED");
@@ -88,6 +92,54 @@ export default function Exercises() {
         }
     };
 
+    const updateRoutineExercises = async () => {
+        // Find exercises to delete (that were previously selected but are no longer selected)
+        const exercisesToRemove = routineExercises.filter(
+            (exercise) => !selectedExercises.includes(exercise.exercise_id),
+        );
+
+        console.log("exercisesToRemove = ", exercisesToRemove);
+
+        // Find exercises to add (new exercises)
+        const exercisesToAdd = selectedExercises.filter(
+            (exerciseId) =>
+                !routineExercises.some((ex) => ex.exercise_id === exerciseId),
+        );
+
+        // Delete the exercises that are no longer selected
+        const { error: deleteError } = await supabase
+            .from("routine_exercises")
+            .delete()
+            .in(
+                "routine_exercise_id",
+                exercisesToRemove.map((ex) => ex.routine_exercise_id),
+            );
+
+        if (deleteError) {
+            console.error("Error removing exercises:", deleteError);
+            return;
+        }
+
+        // Add or update the exercises that were newly selected
+        const { data: insertData, error: insertError } = await supabase
+            .from("routine_exercises")
+            .upsert(
+                exercisesToAdd.map((exerciseId) => ({
+                    exercise_id: exerciseId,
+                    routine_id: routineId,
+                    order_index: null, // Can set a default order or determine the order dynamically
+                    rest_duration: 90, // Can set a default rest duration or customize
+                })),
+                { onConflict: ["exercise_id", "routine_id"] }, // Prevent duplicates based on exercise_id and routine_id
+            );
+
+        if (insertError) {
+            console.error("Error adding/updating exercises:", insertError);
+            return;
+        }
+
+        console.log("Routine exercises updated successfully:", insertData);
+    };
 
     return (
         <View className="flex-1 p-5 bg-white pb-safe-offset-0">
@@ -125,7 +177,8 @@ export default function Exercises() {
                 <Pressable
                     className="p-3 px-4 rounded-lg bg-gray-200"
                     onPress={() => {
-                        createRoutineExercises();
+                        // createRoutineExercises();
+                        updateRoutineExercises();
                         router.back();
                     }}
                 >
