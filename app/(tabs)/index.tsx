@@ -30,7 +30,8 @@ export default function Events() {
 
     useEffect(() => {
         fetchRoutines();
-    });
+        console.log("useEffect Triggered in: index.tsx")
+    }, []);
 
     const fetchRoutines = async () => {
         const { data, error } = await supabase
@@ -52,8 +53,10 @@ export default function Events() {
                 },
             ])
             .select();
+            
         console.log(data);
         console.log(error);
+        fetchRoutines();
     };
     return (
         <View className="flex-1 bg-white p-5">
@@ -74,7 +77,7 @@ export default function Events() {
             <FlatList
                 className="bg-white"
                 data={routines}
-                renderItem={({ item }) => <RoutineListItem routine={item} />}
+                renderItem={({ item }) => <RoutineListItem routine={item} onRoutineDeleted={fetchRoutines}/>}
             />
 
             <Modal

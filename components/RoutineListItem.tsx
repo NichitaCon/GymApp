@@ -4,16 +4,16 @@ import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
 import Entypo from "@expo/vector-icons/Entypo";
 
-export default function RoutineListItem({ routine }) {
-
+export default function RoutineListItem({ routine, onRoutineDeleted }) {
     const deleteRoutine = async () => {
         const { error } = await supabase
             .from("routines")
             .delete()
             .eq("routine_id", routine.routine_id);
-    }
+        onRoutineDeleted();
+    };
 
-    console.log("routine item id = ", routine.routine_id);
+    // console.log("routine item id = ", routine.routine_id);
     return (
         <Link href={`/routine/${routine.routine_id}`} asChild>
             <Pressable className="p-4 mb-3 border rounded-xl border-gray-200 bg-gray-100">
@@ -22,9 +22,11 @@ export default function RoutineListItem({ routine }) {
                         {routine.name}, {routine.routine_id}{" "}
                         {/* Displaying routine name */}
                     </Text>
-                    <Pressable onPress={() => {
-                        deleteRoutine();
-                    }}>
+                    <Pressable
+                        onPress={() => {
+                            deleteRoutine();
+                        }}
+                    >
                         <Entypo
                             name="trash"
                             size={24}

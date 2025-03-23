@@ -21,6 +21,7 @@ export default function Exercises() {
         fetchAllExercises();
         fetchRoutineExercises();
         // updateRoutineExercises();
+        console.log("useEffect Triggered in: exercises.tsx")
     }, [routineId]);
 
     // console.log("exerciseObjArray = ",exerciseObjArray)
