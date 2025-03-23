@@ -34,8 +34,11 @@ export default function RoutinePage() {
     useEffect(() => {
         fetchRoutine();
         fetchRoutineExercise();
-        fetchExercise();
     }, [id]);
+    
+    useEffect(() => {
+        fetchExercise();
+    })
 
     const fetchRoutine = async () => {
         setLoading(true);
