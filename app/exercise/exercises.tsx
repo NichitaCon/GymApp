@@ -1,6 +1,12 @@
 import { View, Text, Pressable, FlatList } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-import { Link, router, Stack, useLocalSearchParams, useRouter } from "expo-router";
+import {
+    Link,
+    router,
+    Stack,
+    useLocalSearchParams,
+    useRouter,
+} from "expo-router";
 import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
 
@@ -8,14 +14,18 @@ export default function Exercises() {
     const { routineId } = useLocalSearchParams();
     
     const [allExercises, setAllExercises] = useState([]);
+    const [routineExercises, setRoutineExercises] = useState([]);
     const [selectedExercises, setSelectedExercises] = useState<number[]>([]);
-
+    
     useEffect(() => {
         fetchAllExercises();
+        fetchRoutineExercises();
     }, [routineId]);
-
-    // Removed the Exercises function as it is no longer needed
-
+    
+    // console.log("exerciseObjArray = ",exerciseObjArray)
+    // console.log("Routine id exercises.tsx = ", routineId);
+    console.log("selected exercises = ", selectedExercises);
+    
     const toggleExerciseSelection = (exerciseId: number) => {
         setSelectedExercises(
             (prev) =>
@@ -31,7 +41,7 @@ export default function Exercises() {
     }));
 
     const fetchAllExercises = async () => {
-        const { data, error } = await supabase.from("exercises").select("*"); // Fetch exercise name
+        const { data, error } = await supabase.from("exercises").select("*");
 
         if (error) {
             console.error("Error fetching exercises:", error);
@@ -42,25 +52,43 @@ export default function Exercises() {
         // console.log("allexercises = ", data, error)
     };
 
+    const fetchRoutineExercises = async () => {
+        const { data, error } = await supabase
+            .from("routine_exercises")
+            .select("*")
+            .eq("routine_id", routineId)
+
+            if (error) {
+                console.error("Error reading exercises in routine_exercises: ", error);
+                return;
+            } else if (!data || data.length === 0) {
+                console.warn("Exercises from routine_exercises are empty.");
+            } else {
+                setRoutineExercises(data);
+                setSelectedExercises(data.map((exercise) => exercise.exercise_id));
+                // console.log("Exercises from routine_exercises: ", data);
+            }
+    }
+
     const createRoutineExercises = async () => {
-        console.log("create routine exercise CALLED")
+        console.log("create routine exercise CALLED");
         const { data, error } = await supabase
             .from("routine_exercises")
             .insert(exerciseObjArray)
             .select();
-        
+
         if (error) {
-            console.error("Error inserting exercises into routine_exercises: ", error);
+            console.error(
+                "Error inserting exercises into routine_exercises: ",
+                error,
+            );
             return;
-        }else {
-            console.log("data inserted into routine_exercises: ",data);
+        } else {
+            console.log("data inserted into routine_exercises: ", data);
         }
     };
 
-    // console.log("exerciseObjArray = ",exerciseObjArray)
 
-    // console.log("selected exercises = ", selectedExercises);
-    // console.log("Routine id exercises.tsx = ", routineId);
     return (
         <View className="flex-1 p-5 bg-white pb-safe-offset-0">
             <Stack.Screen options={{ title: "Exercises" }} />
@@ -89,7 +117,7 @@ export default function Exercises() {
                 <Pressable
                     className="p-3 px-4 rounded-lg bg-gray-200"
                     onPress={() => {
-                        router.back()
+                        router.back();
                     }}
                 >
                     <Text className="text-xl">cancel</Text>
@@ -98,7 +126,7 @@ export default function Exercises() {
                     className="p-3 px-4 rounded-lg bg-gray-200"
                     onPress={() => {
                         createRoutineExercises();
-                        router.back()
+                        router.back();
                     }}
                 >
                     <Text className="text-xl">Save</Text>
