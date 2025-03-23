@@ -47,7 +47,7 @@ export default function RoutinePage() {
         setRoutine(data);
         setLoading(false);
         // console.log("data/routine = ", data);
-        // console.log("id = ", id);
+        console.log("id = ", id);
         setLoading(false);
     };
 
