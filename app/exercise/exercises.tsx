@@ -1,10 +1,12 @@
 import { View, Text, Pressable, FlatList } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-import { Link, Stack, useRouter } from "expo-router";
+import { Link, router, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
 
-export default function Exercises({ routineId }) {
+export default function Exercises() {
+    const { routineId } = useLocalSearchParams();
+    
     const [allExercises, setAllExercises] = useState([]);
     const [selectedExercises, setSelectedExercises] = useState<number[]>([]);
 
@@ -23,6 +25,11 @@ export default function Exercises({ routineId }) {
         );
     };
 
+    const exerciseObjArray = selectedExercises.map((exerciseId) => ({
+        routine_id: routineId,
+        exercise_id: exerciseId,
+    }));
+
     const fetchAllExercises = async () => {
         const { data, error } = await supabase.from("exercises").select("*"); // Fetch exercise name
 
@@ -35,28 +42,24 @@ export default function Exercises({ routineId }) {
         // console.log("allexercises = ", data, error)
     };
 
-    // const createRoutineExercises = async () => {
-    //     const { data, error } = await supabase
-    //         .from("routine_exercises")
-    //         .insert([
-    //             {
-    //                 routineId: routineId,
-    //                 exercise_id: 
-    //             },
-    //         ])
-    //         .select();
-    //     console.log(data);
-    //     console.log(error);
-    // };
+    const createRoutineExercises = async () => {
+        console.log("create routine exercise CALLED")
+        const { data, error } = await supabase
+            .from("routine_exercises")
+            .insert(exerciseObjArray)
+            .select();
+        
+        if (error) {
+            console.error("Error inserting exercises into routine_exercises: ", error);
+            return;
+        }else {
+            console.log("data inserted into routine_exercises: ",data);
+        }
+    };
 
-    const insertData = selectedExercises.map((exerciseId) => ({
-        routine_id: routineId,
-        exercise_id: exerciseId,
-    }));
+    // console.log("exerciseObjArray = ",exerciseObjArray)
 
-    console.log("insertdata = ",insertData)
-
-    console.log("selected exercises = ", selectedExercises);
+    // console.log("selected exercises = ", selectedExercises);
     // console.log("Routine id exercises.tsx = ", routineId);
     return (
         <View className="flex-1 p-5 bg-white pb-safe-offset-0">
@@ -86,7 +89,7 @@ export default function Exercises({ routineId }) {
                 <Pressable
                     className="p-3 px-4 rounded-lg bg-gray-200"
                     onPress={() => {
-                        // add return functionality here later!!!!
+                        router.back()
                     }}
                 >
                     <Text className="text-xl">cancel</Text>
@@ -95,6 +98,7 @@ export default function Exercises({ routineId }) {
                     className="p-3 px-4 rounded-lg bg-gray-200"
                     onPress={() => {
                         createRoutineExercises();
+                        router.back()
                     }}
                 >
                     <Text className="text-xl">Save</Text>
