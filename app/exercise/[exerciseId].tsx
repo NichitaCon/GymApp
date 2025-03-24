@@ -240,7 +240,7 @@ export default function ExerciseScreen() {
                     setModalVisible(true);
                 }}
             >
-                <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl w-1 mb-5">
+                <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl mb-5">
                     <Entypo
                         name="plus"
                         size={24}
@@ -273,7 +273,7 @@ export default function ExerciseScreen() {
                             Log a Workout
                         </Text> */}
                         <View className="flex-row justify-between">
-                            <View className="bg-red-500">
+                            <View className="w-1/3">
                                 <Text className="text-2xl mb-1">Weight</Text>
                                 <TextInput
                                     value={weight}
@@ -283,8 +283,8 @@ export default function ExerciseScreen() {
                                     className="mb-4 p-3 rounded-lg bg-gray-200 w-full"
                                 />
                             </View>
-                            <View>
-                                <Text className="text-2xl mb-1">reps</Text>
+                            <View className="w-1/3 justify-end">
+                                <Text className="text-2xl mb-1">Reps</Text>
                                 <TextInput
                                     value={reps}
                                     onChangeText={(text) => setReps(text)}

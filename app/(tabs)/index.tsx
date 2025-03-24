@@ -129,7 +129,7 @@ export default function Events() {
                         <Pressable onPress={() => {
                             finishWorkoutSession()
                         }}>
-                            <Text className="bg-blue-400 p-2 px-4 rounded-full text-center font-semibold text-xl w-1">
+                            <Text className="bg-blue-400 p-2 px-4 rounded-full text-center font-semibold text-xl">
                                 Finish
                             </Text>
                         </Pressable>
