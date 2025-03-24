@@ -165,7 +165,7 @@ export default function ExerciseScreen() {
     }
 
     return (
-        <View className="flex-1 bg-white p-5">
+        <View className="flex-1 bg-white p-1">
             <Stack.Screen
                 options={{
                     title: exercise ? exercise.name : "Exercise",
@@ -173,9 +173,9 @@ export default function ExerciseScreen() {
                     headerBackTitle: "Home",
                 }}
             />
-            <Text>routine id = {routineId}</Text>
+            {/* <Text>routine id = {routineId}</Text>
             <Text style={{ fontSize: 24 }}>Exercise ID: {exerciseId}</Text>
-            <Text style={{ fontSize: 24 }}>Exercise name: {exercise.name}</Text>
+            <Text style={{ fontSize: 24 }}>Exercise name: {exercise.name}</Text> */}
 
             {/* <FlatList
                 data={workoutSession}
@@ -200,21 +200,25 @@ export default function ExerciseScreen() {
             /> */}
 
             <FlatList
+                className=""
                 data={workoutSession}
                 renderItem={({ item }) => (
                     <View className="p-4">
-                        <Text className="text-xl font-bold">
+                        <Text className="text-2xl mb-1 font-semibold">
                             Session {item.session_id}
                         </Text>
                         <FlatList
+                            className="gap-3 rounded-xl p-2 bg-gray-100"
                             data={setLog}
                             renderItem={({ item: setLogItem }) => (
-                                <View className="p-2 flex-row justify-between border border-gray-300 bg-white mb-2">
-                                    <Text>
+                                <View className="p-2 flex-row justify-between border-b border-gray-300 ">
+                                    <Text className="text-2xl">
                                         {/* {item.session_id}  */}
-                                        Reps:{setLogItem.reps}
+                                        {setLogItem.reps} Reps
                                     </Text>
-                                    <Text>Weight: {setLogItem.weight} Kg</Text>
+                                    <Text className="text-2xl">
+                                        {setLogItem.weight} Kg
+                                    </Text>
                                 </View>
                             )}
                         />
@@ -236,7 +240,7 @@ export default function ExerciseScreen() {
                     setModalVisible(true);
                 }}
             >
-                <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl w-1">
+                <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl w-1 mb-5">
                     <Entypo
                         name="plus"
                         size={24}
@@ -304,7 +308,10 @@ export default function ExerciseScreen() {
                                 className="p-3 px-4 rounded-lg bg-gray-200"
                                 onPress={() => {
                                     fetchWorkoutSession();
-                                    if (workoutSession.length === 0 || !session.completed) {
+                                    if (
+                                        workoutSession.length === 0 ||
+                                        !session.completed
+                                    ) {
                                         createWorkoutSession();
                                         // createSetLog();
                                     } else {
