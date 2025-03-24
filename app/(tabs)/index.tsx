@@ -27,10 +27,12 @@ export default function Events() {
 
     const [name, setName] = useState(null);
     const [description, setDescription] = useState(null);
+    const [workoutSession, setWorkoutSession] = useState([]);
 
     useEffect(() => {
         fetchRoutines();
-        console.log("useEffect Triggered in: index.tsx")
+        fetchWorkoutSession();
+        console.log("useEffect Triggered in: index.tsx");
     }, []);
 
     const fetchRoutines = async () => {
@@ -53,11 +55,45 @@ export default function Events() {
                 },
             ])
             .select();
-            
+
         console.log(data);
         console.log(error);
         fetchRoutines();
     };
+
+    const fetchWorkoutSession = async () => {
+        const { data, error } = await supabase
+            .from("workout_sessions")
+            .select("*, set_logs(*)")
+            .eq("user_id", user.id);
+        setWorkoutSession(data);
+        // console.log(data);
+
+        if (error) {
+            console.warn("setLog error = ", error);
+        } else {
+            console.log("workoutsession table: ", data);
+        }
+    };
+
+    const finishWorkoutSession = async () => {
+        console.log("finishworkoutsession called")
+        const { data, error } = await supabase
+            .from("workout_sessions")
+            .update({ completed: true })
+            
+            .eq("session_id", 19);
+        fetchWorkoutSession();
+        // console.log(data);
+
+        if (error) {
+            console.warn("setLog error = ", error);
+        } else {
+            console.log("workoutsession table: UPDATE", data);
+        }
+    };
+
+    console.log(workoutSession)
     return (
         <View className="flex-1 bg-white p-5">
             <Stack.Screen options={{ title: "Home" }} />
@@ -77,8 +113,29 @@ export default function Events() {
             <FlatList
                 className="bg-white"
                 data={routines}
-                renderItem={({ item }) => <RoutineListItem routine={item} onRoutineDeleted={fetchRoutines}/>}
+                renderItem={({ item }) => (
+                    <RoutineListItem
+                        routine={item}
+                        onRoutineDeleted={fetchRoutines}
+                    />
+                )}
             />
+
+                {workoutSession.some(session => !session.completed) && (
+                    <View className="flex-row justify-between items-center">
+                        <Text className="text-green-500 text-2xl">
+                            Workout session active
+                        </Text>
+                        <Pressable onPress={() => {
+                            finishWorkoutSession()
+                        }}>
+                            <Text className="bg-blue-400 p-2 px-4 rounded-full text-center font-semibold text-xl w-1">
+                                Finish
+                            </Text>
+                        </Pressable>
+                    </View>
+                )}
+
 
             <Modal
                 animationType="slide"
