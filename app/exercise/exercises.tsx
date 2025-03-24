@@ -1,4 +1,10 @@
-import { View, Text, Pressable, FlatList } from "react-native";
+import {
+    View,
+    Text,
+    Pressable,
+    FlatList,
+    ActivityIndicator,
+} from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import {
     Link,
@@ -9,6 +15,7 @@ import {
 } from "expo-router";
 import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
+import React from "react";
 
 export default function Exercises() {
     const { routineId } = useLocalSearchParams();
@@ -16,12 +23,18 @@ export default function Exercises() {
     const [allExercises, setAllExercises] = useState([]);
     const [routineExercises, setRoutineExercises] = useState([]);
     const [selectedExercises, setSelectedExercises] = useState<number[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    if (loading) {
+        console.log("LOADING")
+        return <ActivityIndicator />;
+    }
 
     useEffect(() => {
         fetchAllExercises();
         fetchRoutineExercises();
         // updateRoutineExercises();
-        console.log("useEffect Triggered in: exercises.tsx")
+        console.log("useEffect Triggered in: exercises.tsx");
     }, [routineId]);
 
     // console.log("exerciseObjArray = ",exerciseObjArray)
@@ -94,6 +107,8 @@ export default function Exercises() {
     };
 
     const updateRoutineExercises = async () => {
+        console.log("starting updateRoutineExercises function")
+        setLoading(true);
         // Find exercises to delete (that were previously selected but are no longer selected)
         const exercisesToRemove = routineExercises.filter(
             (exercise) => !selectedExercises.includes(exercise.exercise_id),
@@ -138,9 +153,11 @@ export default function Exercises() {
             console.error("Error adding/updating exercises:", insertError);
             return;
         }
-
-        console.log("Routine exercises updated successfully:", insertData);
+        setLoading(false)
+        console.log("Routine exercises updated successfully:");
     };
+
+
 
     return (
         <View className="flex-1 p-5 bg-white pb-safe-offset-0">
@@ -175,11 +192,14 @@ export default function Exercises() {
                 >
                     <Text className="text-xl">cancel</Text>
                 </Pressable>
+
                 <Pressable
                     className="p-3 px-4 rounded-lg bg-gray-200"
                     onPress={() => {
                         // createRoutineExercises();
                         updateRoutineExercises();
+                        console.log("router back")
+                        router.setParams({ updated: 3})
                         router.back();
                     }}
                 >
