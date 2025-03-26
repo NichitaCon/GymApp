@@ -21,34 +21,54 @@ import { useFocusEffect } from "@react-navigation/native";
 import React from "react";
 
 export default function RoutinePage() {
-    const { template } = useLocalSearchParams();
-    const [templateExercises, setTemplateExercises] = useState([]);
+    const { templateId } = useLocalSearchParams();
+    const [template, setTemplate] = useState([]);
+    const [templateExercise, setTemplateExercise] = useState([]);
 
-
-    console.log(template)
+    console.log("template = ", templateId);
     useEffect(() => {
-        fetchTemplateExercises()
+        fetchTemplate();
+        fetchTemplateExercise();
     }, []);
 
     const [loading, setLoading] = useState(false);
 
     const { user } = useAuth();
 
-    const fetchTemplateExercises = async () => {
+    const fetchTemplate = async () => {
         setLoading(true);
         const { data, error } = await supabase
             .from("templates")
             .select("*")
-            .eq("template_id", template.template_id)
+            .eq("template_id", templateId)
             .single();
-        setTemplateExercises(data);
+        setTemplate(data);
         setLoading(false);
 
         if (error) {
             console.error("Error fetching exercises:", error);
             return;
         } else {
-            console.log("fetchexercise from routinerxercise = ", data)
+            console.log("fetchexercise from routinerxercise = ", data);
+        }
+
+        setLoading(false);
+    };
+
+    const fetchTemplateExercise = async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+            .from("template_exercises")
+            .select("*, exercises(*)")
+            .eq("template_id", templateId);
+        setTemplateExercise(data);
+        setLoading(false);
+
+        if (error) {
+            console.error("Error fetching exercises:", error);
+            return;
+        } else {
+            console.log("fetchexercise from TemplateExercise = ", data);
         }
 
         setLoading(false);
@@ -58,35 +78,38 @@ export default function RoutinePage() {
         return <ActivityIndicator />;
     }
 
-    if (!template) {
+    if (!templateId) {
+        console.log(templateId);
         return <Text>id not found</Text>;
     }
 
     return (
-        <View className="flex-1 p-3 gap-3 bg-white">
+        <View className="flex-1 p-4 gap-3 bg-white">
             <Stack.Screen
                 options={{
-                    title: routine ? routine.name : "Routine",
+                    title: template ? template?.name : "Template",
                     headerTintColor: "black",
                     headerBackTitle: "Home",
                 }}
             />
 
-            {/* <FlatList
-                data={exercise}
-                renderItem={({ item }) => (
-                    <View className="p-2">
-                        <Text>Routine ID: {item.routine_id}</Text>
-                        <Text>Exercise ID: {item.exercises.name}</Text>
-                    </View>
-                )}
-            /> */}
+            <Text className="text-2xl">
+                {template.description}
+            </Text>
 
             <FlatList
                 className="bg-white p-1"
-                data={exercise}
+                data={templateExercise}
                 renderItem={({ item }) => (
-                    <ExerciseListItem exercise={item} routineId={id} />
+                    <View className="flex-row p-3 border border-gray-200 bg-gray-100">
+                        <View className="flex-1">
+                            <Text className="text-2xl" numberOfLines={1}>
+                                {item.exercises.name}
+                                {/* Displaying exercise name */}
+                            </Text>
+                            {/* <Text className="text-gray-700">{exercise.exercises.description}</Text> */}
+                        </View>
+                    </View>
                 )}
             />
             {/* <Link href={`/exercise/exercises?routineId=${id}`} asChild>
