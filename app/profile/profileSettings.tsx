@@ -1,5 +1,5 @@
-import Entypo from "@expo/vector-icons/Entypo";
-import { Link, Stack } from "expo-router";
+
+import { Stack } from "expo-router";
 import React from "react";
 import { useEffect, useState } from "react";
 import { Alert, Button, Pressable, Text, TextInput, View } from "react-native";
@@ -84,25 +84,50 @@ export default function Profile() {
     }
     return (
         <View className="flex-1 bg-white p-5 gap-3">
-            <Stack.Screen options={{ title: "Profile" }} />
-            <View className="flex-row justify-between">
+            <Stack.Screen options={{ title: "Profile settings" }} />
 
-            <View>
-                <Text className="text-5xl">{fullName}</Text>
-                <Text className="text-xl text-gray-500">{username}</Text>
-                <Text className=" text-gray-500">Role: {role}</Text>
-            </View>
-            <Link href={`/profile/profileSettings`} asChild>
-                <Pressable>
-                    <Entypo
-                        name="cog"
-                        size={24}
-                        color="black"
-                        className="bg-blue-400 p-3 rounded-full"
-                    />
-                </Pressable>
-            </Link>
-            </View>
+            <TextInput
+            editable={false}
+            value={session.user.email}
+            placeholder="email"
+            autoCapitalize={"none"}
+            className="border p-3 border-gray-400 rounded-md text-gray-500"
+            />
+            
+            <TextInput
+            onChangeText={(text) => setFullName(text)}
+            value={fullName}
+            placeholder="full name"
+            autoCapitalize={"none"}
+            className="border p-3 border-gray-400 rounded-md"
+            />
+            
+            <TextInput
+            onChangeText={(text) => setUsername(text)}
+            value={username}
+            placeholder="username"
+            autoCapitalize={"none"}
+            className="border p-3 border-gray-400 rounded-md"
+            />
+            
+            <Pressable
+            onPress={() =>
+                updateProfile({
+                    username,
+                    avatar_url: avatarUrl,
+                    full_name: fullName,
+                })
+            }
+            disabled={loading}
+            className="p-4  bg-blue-400 rounded-md items-center"
+            >
+            <Text className="font-bold text-white text-lg">Save</Text>
+            </Pressable>
+            
+            <Button
+            title="sign out"
+            onPress={() => supabase.auth.signOut()}
+            ></Button>
         </View>
     );
 }

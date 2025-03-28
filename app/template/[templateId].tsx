@@ -74,6 +74,13 @@ export default function RoutinePage() {
         setLoading(false);
     };
 
+    const insertWorkoutTemplate = async () => {
+        const { data, error } = await supabase
+            .from("routines")
+            .insert([{ some_column: "someValue", other_column: "otherValue" }])
+            
+    };
+
     if (loading) {
         return <ActivityIndicator />;
     }
@@ -93,9 +100,7 @@ export default function RoutinePage() {
                 }}
             />
 
-            <Text className="text-2xl">
-                {template.description}
-            </Text>
+            <Text className="text-2xl">{template.description}</Text>
 
             <FlatList
                 className="bg-white p-1"
@@ -112,6 +117,12 @@ export default function RoutinePage() {
                     </View>
                 )}
             />
+
+            <Pressable>
+                <Text className="bg-blue-400 p-3 px-4 rounded-full text-center font-semibold text-xl">
+                    Add to Workouts
+                </Text>
+            </Pressable>
             {/* <Link href={`/exercise/exercises?routineId=${id}`} asChild>
                 <Pressable>
                     <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl">
