@@ -44,7 +44,7 @@ export default function Events() {
     };
 
     const createRoutine = async () => {
-        console.log(name, description);
+        console.log("Createroutine data before backend: ",name, description);
         const { data, error } = await supabase
             .from("routines")
             .insert([
@@ -56,8 +56,12 @@ export default function Events() {
             ])
             .select();
 
-        console.log(data);
-        console.log(error);
+
+        if (error) {
+            console.warn("create error = ", error);
+        } else {
+            console.log("routine insert: ", data);
+        }
         fetchRoutines();
     };
 
@@ -72,7 +76,7 @@ export default function Events() {
         if (error) {
             console.warn("setLog error = ", error);
         } else {
-            console.log("workoutsession table: ", data);
+            // console.log("workoutsession table: ", data);
         }
     };
 
@@ -80,9 +84,9 @@ export default function Events() {
         console.log("finishworkoutsession called")
         const { data, error } = await supabase
             .from("workout_sessions")
-            .update({ completed: true })
-            
-            .eq("session_id", 19);
+            .update({ completed: true, endtime: new Date() })
+            .eq("user_id", user.id)
+            .eq("completed", false); // only update incomplete sessions
         fetchWorkoutSession();
         // console.log(data);
 
@@ -93,7 +97,6 @@ export default function Events() {
         }
     };
 
-    console.log(workoutSession)
     return (
         <View className="flex-1 bg-white p-5">
             <Stack.Screen options={{ title: "Home" }} />
