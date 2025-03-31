@@ -100,6 +100,48 @@ export default function RoutinePage() {
         setExercise(data);
     };
 
+    const insertTemplateRoutine = async () => {
+            console.log("Creating template...");
+        
+            // Step 1: Create a new routine
+            const { data: templateData, error: templateError } = await supabase
+                .from("templates")
+                .insert([{ creator_id: user.id, name: routine.name, description: routine.description }])
+                .select("template_id")
+                .single();
+        
+            if (templateError) {
+                console.error("Error creating template:", templateError);
+                return;
+            }
+        
+            const templateId = templateData.template_id;
+            console.log("New template created with ID:", templateId);
+        
+    
+            // Step 2: Insert copied exercises into template_exercises
+            const templateExercises = routineExercise.map((exercise) => ({
+                template_id: templateId,
+                exercise_id: exercise.exercise_id,
+                rest_duration: exercise.rest_duration,
+            }));
+        
+            if (templateExercises.length === 0) {
+                console.log("No exercises found for this template.");
+                return;
+            }
+        
+            const { error: insertError } = await supabase
+                .from("template_exercises")
+                .insert(templateExercises);
+        
+            if (insertError) {
+                console.error("Error inserting template exercises:", insertError);
+            } else {
+                console.log("template exercises added successfully!");
+            }
+        };
+
     // useEffect(() => {
     //     console.log("all exercises in routine id ", id, ": ", exercise);
     // }, [exercise]);
@@ -160,6 +202,15 @@ export default function RoutinePage() {
                 </Pressable>
                 {/* <Exercises updateExerciseList={updateExerciseList} /> */}
             </Link>
+            {/* <Link href={`/search`} asChild> */}
+                <Pressable
+                onPress={(() => insertTemplateRoutine())}>
+                    <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl">
+                        Create Template
+                    </Text>
+                </Pressable>
+                {/* <Exercises updateExerciseList={updateExerciseList} /> */}
+            {/* </Link> */}
         </View>
     );
 }
