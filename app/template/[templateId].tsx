@@ -74,11 +74,47 @@ export default function RoutinePage() {
         setLoading(false);
     };
 
+
     const insertWorkoutTemplate = async () => {
-        const { data, error } = await supabase
+        console.log("Creating routine...");
+    
+        // Step 1: Create a new routine
+        const { data: routineData, error: routineError } = await supabase
             .from("routines")
-            .insert([{ some_column: "someValue", other_column: "otherValue" }])
-            
+            .insert([{ user_id: user.id, name: template.name, description: template.description }])
+            .select("routine_id")
+            .single();
+    
+        if (routineError) {
+            console.error("Error creating routine:", routineError);
+            return;
+        }
+    
+        const routineId = routineData.routine_id;
+        console.log("New routine created with ID:", routineId);
+    
+
+        // Step 2: Insert copied exercises into routine_exercises
+        const routineExercises = templateExercise.map((exercise) => ({
+            routine_id: routineId,
+            exercise_id: exercise.exercises.exercise_id,
+            rest_duration: exercise.exercises.rest_duration,
+        }));
+    
+        if (routineExercises.length === 0) {
+            console.log("No exercises found for this template.");
+            return;
+        }
+    
+        const { error: insertError } = await supabase
+            .from("routine_exercises")
+            .insert(routineExercises);
+    
+        if (insertError) {
+            console.error("Error inserting routine exercises:", insertError);
+        } else {
+            console.log("Routine exercises added successfully!");
+        }
     };
 
     if (loading) {
@@ -118,7 +154,9 @@ export default function RoutinePage() {
                 )}
             />
 
-            <Pressable>
+            <Pressable onPress={(() => {
+                insertWorkoutTemplate()
+            })}>
                 <Text className="bg-blue-400 p-3 px-4 rounded-full text-center font-semibold text-xl">
                     Add to Workouts
                 </Text>
