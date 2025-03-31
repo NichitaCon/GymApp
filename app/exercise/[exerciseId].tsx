@@ -22,6 +22,7 @@ export default function ExerciseScreen() {
     const [workoutSession, setWorkoutSession] = useState([]);
     const [routineExercises, setRoutineExercises] = useState([]);
     const [exercise, setExercise] = useState(false);
+    const [newSessionId, setNewSessionId] = useState("");
 
     const [weight, setWeight] = useState("");
     const [reps, setReps] = useState("");
@@ -37,9 +38,9 @@ export default function ExerciseScreen() {
         fetchExercise();
     }, [exerciseId]);
 
-    console.log("routineId = ", routineId);
+    // console.log("routineId = ", routineId);
     // console.log("Workout session = ", JSON.stringify(workoutSession, null, 2));
-    console.log("setlog = ", JSON.stringify(setLog, null, 2));
+    // console.log("setlog = ", JSON.stringify(setLog, null, 2));
     // console.log("routineExercises = ", JSON.stringify(routineExercises, null, 1));
     // console.log(
     //     "workout session setlogs reps",
@@ -75,7 +76,7 @@ export default function ExerciseScreen() {
             console.error("Error fetching exercises:", error);
             return;
         }
-        console.log("fetchexercise from exercise = ", data.name);
+        // console.log("fetchexercise from exercise = ", data.name);
 
         setExercise(data);
         // console.log(data?.name);
@@ -103,14 +104,14 @@ export default function ExerciseScreen() {
         const { data, error } = await supabase
             .from("workout_sessions")
             .select("*, set_logs(*)")
-            .eq("routine_id", routineId);
+            .eq("user_id", user.id);
         setWorkoutSession(data);
         // console.log(data);
 
         if (error) {
             console.warn("setLog error = ", error);
         } else {
-            console.log("workoutsession table: ", data);
+            // console.log("workoutsession table: ", data);
         }
 
         setLoading(false);
@@ -129,36 +130,56 @@ export default function ExerciseScreen() {
                     completed: false,
                 },
             ])
-            .select();
+            .select("session_id"); // Select only session_id to get the ID of the created session
 
         if (error) {
-            console.error(error);
+            console.error("Error creating workout session:", error);
+            return null; // Return null in case of error
         } else {
             console.log("created workout session: ", data);
+            return data[0].session_id; // Return session ID directly
         }
-        fetchWorkoutSession();
     };
 
-    const createSetLog = async () => {
-        const latestSession = workoutSession[workoutSession.length - 1];
+    const createSetLog = async (sessionId) => {
+        if (!sessionId) {
+            console.log("No session ID available, cannot create set log.");
+            return; // If no session ID, exit early
+        }
+
+        console.log(
+            "create set log before ",
+            sessionId,
+            exerciseId,
+            weight,
+            reps,
+        );
+
         const { data, error } = await supabase
             .from("set_logs")
             .insert([
                 {
-                    session_id: 19,
+                    session_id: sessionId, // Use the passed sessionId here
                     exercise_id: exerciseId,
                     weight: weight,
                     reps: reps,
                 },
             ])
-            .select();
+            .select("*");
 
-        console.log(data);
+        console.log("create set log data: ", data);
         console.log(error);
-        fetchRoutines();
+        fetchSetLog();
     };
 
-    console.log("workout session = ", workoutSession);
+    // Example function to call both operations sequentially
+    const handleNewSetLogSession = async () => {
+        let sessionId = "";
+        if (newSessionId === "") {
+            sessionId = await createWorkoutSession(); // Wait for workout session to be created
+        }
+        await createSetLog(sessionId); // Pass sessionId directly to createSetLog
+    };
 
     if (loading) {
         return <ActivityIndicator />;
@@ -226,13 +247,20 @@ export default function ExerciseScreen() {
                 )}
             />
 
-            {workoutSession.some(
-                (session) => session.session_id === 19 && !session.completed,
-            ) && (
+            {workoutSession.some((session) => !session.completed) && (
                 <Text className="text-green-500 text-xl">
                     Workout session active
                 </Text>
             )}
+
+            {/* <Pressable
+                className="p-3 px-4 rounded-lg bg-gray-200"
+                onPress={() => {
+                    createWorkoutSession();
+                }}
+            >
+                <Text className="text-xl">CreateWkSession</Text>
+            </Pressable> */}
 
             {/* <Link href={`/exercise/exercises?routineId=`} asChild> */}
             <Pressable
@@ -308,16 +336,8 @@ export default function ExerciseScreen() {
                                 className="p-3 px-4 rounded-lg bg-gray-200"
                                 onPress={() => {
                                     fetchWorkoutSession();
-                                    if (
-                                        workoutSession.length === 0 ||
-                                        !session.completed
-                                    ) {
-                                        createWorkoutSession();
-                                        // createSetLog();
-                                    } else {
-                                        createSetLog();
-                                        fetchSetLog();
-                                    }
+                                    handleNewSetLogSession();
+                                    fetchSetLog();
                                     setModalVisible(false);
                                 }}
                             >

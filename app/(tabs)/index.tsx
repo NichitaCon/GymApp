@@ -84,7 +84,7 @@ export default function Events() {
         console.log("finishworkoutsession called")
         const { data, error } = await supabase
             .from("workout_sessions")
-            .update({ completed: true, endtime: new Date() })
+            .update({ completed: true, end_time: new Date() })
             .eq("user_id", user.id)
             .eq("completed", false); // only update incomplete sessions
         fetchWorkoutSession();
