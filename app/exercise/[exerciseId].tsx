@@ -108,7 +108,8 @@ export default function ExerciseScreen() {
             .from("workout_sessions")
             .select("*, set_logs!inner(*)")
             .eq("user_id", user.id)
-            .eq("set_logs.exercise_id", exerciseId);
+            .eq("set_logs.exercise_id", exerciseId)
+            .order("start_time", { ascending: false });
         setWorkoutSession(data);
         // console.log(data);
 
@@ -287,7 +288,7 @@ export default function ExerciseScreen() {
                         {item.set_logs.length > 0 ? (
                             <FlatList
                                 className="gap-3 rounded-xl p-2 bg-gray-100"
-                                data={item.set_logs}
+                                data={[...item.set_logs].reverse()}
                                 renderItem={({ item: setLogItem }) => (
                                     <View className="p-2 flex-row justify-between">
                                         <Text className="text-2xl">
