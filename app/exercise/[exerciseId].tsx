@@ -290,14 +290,19 @@ export default function ExerciseScreen() {
                                 className="gap-3 rounded-xl p-2 bg-gray-100"
                                 data={[...item.set_logs].reverse()}
                                 renderItem={({ item: setLogItem }) => (
-                                    <View className="p-2 flex-row justify-between">
-                                        <Text className="text-2xl">
-                                            {setLogItem.reps} Reps
-                                        </Text>
-                                        <Text className="text-2xl">
-                                            {setLogItem.weight} Kg
-                                        </Text>
-                                    </View>
+                                    <Link
+                                        href={`/exercise/setLog/${setLogItem.set_log_id}`}
+                                        asChild
+                                    >
+                                        <Pressable className="p-2 flex-row justify-between">
+                                            <Text className="text-2xl">
+                                                {setLogItem.reps} Reps
+                                            </Text>
+                                            <Text className="text-2xl">
+                                                {setLogItem.weight} Kg
+                                            </Text>
+                                        </Pressable>
+                                    </Link>
                                 )}
                             />
                         ) : (
@@ -340,72 +345,83 @@ export default function ExerciseScreen() {
             {/* <Exercises updateExerciseList={updateExerciseList} />
             </Link> */}
 
-<Modal animationType="slide" transparent={true} visible={modalVisible}>
-    <Pressable
-        onPress={() => setModalVisible(false)}
-        className="flex-auto justify-end items-center bg-black/20 backdrop-blur-xl"
-    >
-        <KeyboardAvoidingView 
-            behavior={Platform.OS === "ios" ? "padding" : "height"} 
-            className="w-full"
-        >
-            <ScrollView 
-                contentContainerStyle={{ flexGrow: 1 }} 
-                keyboardShouldPersistTaps="handled"
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
             >
                 <Pressable
-                    onPress={() => setModalVisible(true)}
-                    className="bg-white p-6 rounded-lg w-full"
+                    onPress={() => setModalVisible(false)}
+                    className="flex-auto justify-end items-center bg-black/20 backdrop-blur-xl"
                 >
-                    <View className="flex-row justify-between">
-                        <View className="w-1/3 justify-end">
-                            <Text className="text-2xl mb-1">Reps</Text>
-                            <TextInput
-                                value={reps}
-                                onChangeText={(text) => setReps(text)}
-                                placeholder="Reps"
-                                keyboardType="number-pad"
-                                placeholderTextColor="gray"
-                                className="mb-4 p-3 rounded-lg bg-gray-200"
-                            />
-                        </View>
-                        <View className="w-1/3">
-                            <Text className="text-2xl mb-1">Weight</Text>
-                            <TextInput
-                                value={weight}
-                                onChangeText={(text) => setWeight(text)}
-                                placeholder="kg"
-                                keyboardType="decimal-pad"
-                                placeholderTextColor="gray"
-                                className="mb-4 p-3 rounded-lg bg-gray-200 w-full"
-                            />
-                        </View>
-                    </View>
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === "ios" ? "padding" : "height"}
+                        className="w-full"
+                    >
+                        <ScrollView
+                            contentContainerStyle={{ flexGrow: 1 }}
+                            keyboardShouldPersistTaps="handled"
+                        >
+                            <Pressable
+                                onPress={() => setModalVisible(true)}
+                                className="bg-white p-6 rounded-lg w-full"
+                            >
+                                <View className="flex-row justify-between">
+                                    <View className="w-1/3 justify-end">
+                                        <Text className="text-2xl mb-1">
+                                            Reps
+                                        </Text>
+                                        <TextInput
+                                            value={reps}
+                                            onChangeText={(text) =>
+                                                setReps(text)
+                                            }
+                                            placeholder="Reps"
+                                            keyboardType="number-pad"
+                                            placeholderTextColor="gray"
+                                            className="mb-4 p-3 rounded-lg bg-gray-200"
+                                        />
+                                    </View>
+                                    <View className="w-1/3">
+                                        <Text className="text-2xl mb-1">
+                                            Weight
+                                        </Text>
+                                        <TextInput
+                                            value={weight}
+                                            onChangeText={(text) =>
+                                                setWeight(text)
+                                            }
+                                            placeholder="kg"
+                                            keyboardType="decimal-pad"
+                                            placeholderTextColor="gray"
+                                            className="mb-4 p-3 rounded-lg bg-gray-200 w-full"
+                                        />
+                                    </View>
+                                </View>
 
-                    <View className="flex-row justify-between">
-                        <Pressable
-                            className="p-3 px-4 rounded-lg bg-gray-200"
-                            onPress={() => setModalVisible(false)}
-                        >
-                            <Text className="text-xl">Cancel</Text>
-                        </Pressable>
-                        <Pressable
-                            className="p-3 px-4 rounded-lg bg-gray-200"
-                            onPress={() => {
-                                fetchWorkoutSession();
-                                handleNewSetLogSession();
-                                setModalVisible(false);
-                            }}
-                        >
-                            <Text className="text-xl">Save</Text>
-                        </Pressable>
-                    </View>
+                                <View className="flex-row justify-between">
+                                    <Pressable
+                                        className="p-3 px-4 rounded-lg bg-gray-200"
+                                        onPress={() => setModalVisible(false)}
+                                    >
+                                        <Text className="text-xl">Cancel</Text>
+                                    </Pressable>
+                                    <Pressable
+                                        className="p-3 px-4 rounded-lg bg-gray-200"
+                                        onPress={() => {
+                                            fetchWorkoutSession();
+                                            handleNewSetLogSession();
+                                            setModalVisible(false);
+                                        }}
+                                    >
+                                        <Text className="text-xl">Save</Text>
+                                    </Pressable>
+                                </View>
+                            </Pressable>
+                        </ScrollView>
+                    </KeyboardAvoidingView>
                 </Pressable>
-            </ScrollView>
-        </KeyboardAvoidingView>
-    </Pressable>
-</Modal>
-
+            </Modal>
         </View>
     );
 }
