@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAuth } from "~/contexts/AuthProvider";
+import dayjs from "dayjs";
 
 export default function ExerciseScreen() {
     const { exerciseId, routineId } = useLocalSearchParams(); // Get exercise ID
@@ -103,8 +104,9 @@ export default function ExerciseScreen() {
         setLoading(true);
         const { data, error } = await supabase
             .from("workout_sessions")
-            .select("*, set_logs(*)")
-            .eq("user_id", user.id);
+            .select("*, set_logs!inner(*)")
+            .eq("user_id", user.id)
+            .eq("set_logs.exercise_id", exerciseId);
         setWorkoutSession(data);
         // console.log(data);
 
@@ -117,9 +119,59 @@ export default function ExerciseScreen() {
         setLoading(false);
     };
 
-    const createWorkoutSession = async () => {
-        console.log("create WorkoutSession called");
-        const { data, error } = await supabase
+    // const createWorkoutSession = async () => {
+    //     console.log("create WorkoutSession called");
+    //     const { data, error } = await supabase
+    //         .from("workout_sessions")
+    //         .insert([
+    //             {
+    //                 user_id: user.id,
+    //                 routine_id: routineId,
+    //                 end_time: null,
+    //                 notes: null,
+    //                 completed: false,
+    //             },
+    //         ])
+    //         .select("session_id"); // Select only session_id to get the ID of the created session
+
+    //     if (error) {
+    //         console.error("Error creating workout session:", error);
+    //         return null; // Return null in case of error
+    //     } else {
+    //         console.log("created workout session: ", data);
+    //         setNewSessionId(data[0].session_id)
+    //         return data[0].session_id; // Return session ID directly
+    //     }
+    // };
+
+    const getOrCreateWorkoutSession = async () => {
+        console.log("Checking for existing incomplete workout session...");
+
+        // Step 1: Check if an incomplete workout session exists
+        const { data: existingSessions, error: fetchError } = await supabase
+            .from("workout_sessions")
+            .select("session_id")
+            .eq("user_id", user.id)
+            .eq("completed", false)
+            .limit(1); // Only need the first incomplete session
+
+        if (fetchError) {
+            console.error("Error fetching workout sessions:", fetchError);
+            return null;
+        }
+
+        if (existingSessions.length > 0) {
+            console.log(
+                "Returning existing session:",
+                existingSessions[0].session_id,
+            );
+            setNewSessionId(existingSessions[0].session_id); // Store in state
+            return existingSessions[0].session_id;
+        }
+
+        // Step 2: If no incomplete session exists, create a new one
+        console.log("No existing session found, creating new session...");
+        const { data: newSession, error: insertError } = await supabase
             .from("workout_sessions")
             .insert([
                 {
@@ -130,15 +182,17 @@ export default function ExerciseScreen() {
                     completed: false,
                 },
             ])
-            .select("session_id"); // Select only session_id to get the ID of the created session
+            .select("session_id")
+            .single(); // Ensures we get a single object instead of an array
 
-        if (error) {
-            console.error("Error creating workout session:", error);
-            return null; // Return null in case of error
-        } else {
-            console.log("created workout session: ", data);
-            return data[0].session_id; // Return session ID directly
+        if (insertError) {
+            console.error("Error creating workout session:", insertError);
+            return null;
         }
+
+        console.log("Created new workout session:", newSession.session_id);
+        setNewSessionId(newSession.session_id); // Store in state
+        return newSession.session_id;
     };
 
     const createSetLog = async (sessionId) => {
@@ -176,15 +230,20 @@ export default function ExerciseScreen() {
     const handleNewSetLogSession = async () => {
         let sessionId = "";
         if (newSessionId === "") {
-            sessionId = await createWorkoutSession(); // Wait for workout session to be created
+            sessionId = await getOrCreateWorkoutSession(); // Wait for workout session to be created
         }
-        await createSetLog(sessionId); // Pass sessionId directly to createSetLog
+        console.log("session id inside handle: ", sessionId);
+        await createSetLog(sessionId || newSessionId); // Pass sessionId directly to createSetLog
+        await fetchSetLog();
     };
+
+    console.log("newSessionId outside: ", newSessionId);
 
     if (loading) {
         return <ActivityIndicator />;
     }
 
+    // console.log("workout session = ", JSON.stringify(workoutSession, null, 2));
     return (
         <View className="flex-1 bg-white p-1">
             <Stack.Screen
@@ -210,17 +269,6 @@ export default function ExerciseScreen() {
             /> */}
 
             {/* <FlatList
-                data={workoutSession.flatMap((session) => session.set_logs)}
-                renderItem={({ item }) => (
-                    <View className="p-2">
-                        <Text>Session ID: {item.session_id}</Text>
-                        <Text>Reps: {item.reps}</Text>
-                        <Text>Weight: {item.weight} Kg</Text>
-                    </View>
-                )}
-            /> */}
-
-            <FlatList
                 className=""
                 data={workoutSession}
                 renderItem={({ item }) => (
@@ -234,7 +282,7 @@ export default function ExerciseScreen() {
                             renderItem={({ item: setLogItem }) => (
                                 <View className="p-2 flex-row justify-between border-b border-gray-300 ">
                                     <Text className="text-2xl">
-                                        {/* {item.session_id}  */}
+                                    
                                         {setLogItem.reps} Reps
                                     </Text>
                                     <Text className="text-2xl">
@@ -243,6 +291,40 @@ export default function ExerciseScreen() {
                                 </View>
                             )}
                         />
+                    </View>
+                )}
+            /> */}
+
+            <FlatList
+                data={workoutSession}
+                renderItem={({ item }) => (
+                    <View className="p-4">
+                        <Text className="text-sm text-gray-500">
+                            session id: {item.session_id}
+                        </Text>
+                        <Text className="text-2xl mb-1 font-semibold">
+                            {dayjs(item.start_time).format("dddd D")}
+                        </Text>
+
+                        {/* Displaying a fallback message if no set logs */}
+                        {item.set_logs.length > 0 ? (
+                            <FlatList
+                                className="gap-3 rounded-xl p-2 bg-gray-100"
+                                data={item.set_logs}
+                                renderItem={({ item: setLogItem }) => (
+                                    <View className="p-2 flex-row justify-between">
+                                        <Text className="text-2xl">
+                                            {setLogItem.reps} Reps
+                                        </Text>
+                                        <Text className="text-2xl">
+                                            {setLogItem.weight} Kg
+                                        </Text>
+                                    </View>
+                                )}
+                            />
+                        ) : (
+                            <Text>No set logs for this session</Text>
+                        )}
                     </View>
                 )}
             />
@@ -301,16 +383,6 @@ export default function ExerciseScreen() {
                             Log a Workout
                         </Text> */}
                         <View className="flex-row justify-between">
-                            <View className="w-1/3">
-                                <Text className="text-2xl mb-1">Weight</Text>
-                                <TextInput
-                                    value={weight}
-                                    onChangeText={(text) => setWeight(text)}
-                                    placeholder="kg"
-                                    placeholderTextColor="gray"
-                                    className="mb-4 p-3 rounded-lg bg-gray-200 w-full"
-                                />
-                            </View>
                             <View className="w-1/3 justify-end">
                                 <Text className="text-2xl mb-1">Reps</Text>
                                 <TextInput
@@ -319,6 +391,16 @@ export default function ExerciseScreen() {
                                     placeholder="Reps"
                                     placeholderTextColor="gray"
                                     className="mb-4 p-3 rounded-lg bg-gray-200"
+                                />
+                            </View>
+                            <View className="w-1/3">
+                                <Text className="text-2xl mb-1">Weight</Text>
+                                <TextInput
+                                    value={weight}
+                                    onChangeText={(text) => setWeight(text)}
+                                    placeholder="kg"
+                                    placeholderTextColor="gray"
+                                    className="mb-4 p-3 rounded-lg bg-gray-200 w-full"
                                 />
                             </View>
                         </View>
