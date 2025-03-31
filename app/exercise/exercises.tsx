@@ -164,7 +164,7 @@ export default function Exercises() {
             <Stack.Screen options={{ title: "Exercises" }} />
             {/* <Text className="text-4xl mb-5 text-center">Exercises</Text> */}
 
-            <Text>routine id = {routineId}</Text>
+            {/* <Text>routine id = {routineId}</Text> */}
             <FlatList
                 data={allExercises}
                 renderItem={({ item }) => (

@@ -19,7 +19,7 @@ export default function RoutineListItem({ routine, onRoutineDeleted }) {
             <Pressable className="p-4 mb-3 border rounded-xl border-gray-200 bg-gray-100">
                 <View className="flex-row justify-between items-center">
                     <Text className="text-2xl" numberOfLines={2}>
-                        {routine.name}, {routine.routine_id}{" "}
+                        {routine.name}
                         {/* Displaying routine name */}
                     </Text>
                     <Pressable

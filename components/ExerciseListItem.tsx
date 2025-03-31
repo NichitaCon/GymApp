@@ -10,9 +10,9 @@ export default function ExerciseListItem({ exercise, routineId }) {
             <Pressable className="p-3 border border-gray-200 bg-gray-100">
                 <View className="flex-row">
                     <View className="flex-1">
-                        <Text>routine id = {routineId}</Text>
+                        {/* <Text>routine id = {routineId}</Text> */}
                         <Text className="text-2xl" numberOfLines={1}>
-                            {exercise.exercises.name} - Exercise id: {exercise.exercise_id} {/* Displaying exercise name */}
+                            {exercise.exercises.name}{/* Displaying exercise name */}
                         </Text>
                     {/* <Text className="text-gray-700">{exercise.exercises.description}</Text> */}
                     </View>
