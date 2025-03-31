@@ -52,39 +52,6 @@ export default function Profile() {
         }
     }
 
-    async function updateProfile({
-        username,
-        avatar_url,
-        full_name,
-    }: {
-        username: string;
-        avatar_url: string;
-    }) {
-        try {
-            setLoading(true);
-            if (!session?.user) throw new Error("No user on the session!");
-
-            const updates = {
-                id: session?.user.id,
-                username,
-                avatar_url,
-                full_name,
-                updated_at: new Date(),
-            };
-
-            const { error } = await supabase.from("profiles").upsert(updates);
-
-            if (error) {
-                throw error;
-            }
-        } catch (error) {
-            if (error instanceof Error) {
-                Alert.alert(error.message);
-            }
-        } finally {
-            setLoading(false);
-        }
-    }
     return (
         <View className="flex-1 bg-white p-5 gap-3">
             <Stack.Screen options={{ title: "Profile" }} />
