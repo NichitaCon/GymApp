@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Stack, useFocusEffect } from "expo-router";
 import {
     FlatList,
     View,
@@ -11,7 +11,7 @@ import {
 
 import RoutineListItem from "~/components/RoutineListItem";
 import { supabase } from "~/utils/supabase";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "~/contexts/AuthProvider";
 
 import Entypo from "@expo/vector-icons/Entypo";
@@ -31,9 +31,15 @@ export default function Events() {
 
     useEffect(() => {
         fetchRoutines();
-        fetchWorkoutSession();
-        console.log("useEffect Triggered in: index.tsx");
+        // console.log("useEffect Triggered in: index.tsx");
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchWorkoutSession();
+            // console.log("usefocus effect called in index.tsx!")
+        }, [])
+      );
 
     const fetchRoutines = async () => {
         const { data, error } = await supabase
