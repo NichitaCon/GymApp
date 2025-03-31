@@ -1,5 +1,5 @@
 import Entypo from "@expo/vector-icons/Entypo";
-import { Link, Stack } from "expo-router";
+import { Link, Stack, useGlobalSearchParams, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { useEffect, useState } from "react";
 import { Alert, Button, Pressable, Text, TextInput, View } from "react-native";
@@ -13,12 +13,15 @@ export default function Profile() {
     const [fullName, setFullName] = useState("");
     const [avatarUrl, setAvatarUrl] = useState("");
     const [role, setRole] = useState("");
+    const { params } = useGlobalSearchParams();
+
+    console.log("router push params in profile.tsx", params)
 
     const { session } = useAuth();
 
     useEffect(() => {
         if (session) getProfile();
-    }, [session]);
+    }, [params]);
 
     async function getProfile() {
         try {

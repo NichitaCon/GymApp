@@ -1,5 +1,4 @@
-
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import React from "react";
 import { useEffect, useState } from "react";
 import { Alert, Button, Pressable, Text, TextInput, View } from "react-native";
@@ -87,46 +86,57 @@ export default function Profile() {
             <Stack.Screen options={{ title: "Profile settings" }} />
 
             <TextInput
-            editable={false}
-            value={session.user.email}
-            placeholder="email"
-            autoCapitalize={"none"}
-            className="border p-3 border-gray-400 rounded-md text-gray-500"
+                editable={false}
+                value={session.user.email}
+                placeholder="email"
+                autoCapitalize={"none"}
+                className="border p-3 border-gray-400 rounded-md text-gray-500"
             />
-            
+
             <TextInput
-            onChangeText={(text) => setFullName(text)}
-            value={fullName}
-            placeholder="full name"
-            autoCapitalize={"none"}
-            className="border p-3 border-gray-400 rounded-md"
+                onChangeText={(text) => setFullName(text)}
+                value={fullName}
+                placeholder="full name"
+                autoCapitalize={"none"}
+                className="border p-3 border-gray-400 rounded-md"
             />
-            
+
             <TextInput
-            onChangeText={(text) => setUsername(text)}
-            value={username}
-            placeholder="username"
-            autoCapitalize={"none"}
-            className="border p-3 border-gray-400 rounded-md"
+                onChangeText={(text) => setUsername(text)}
+                value={username}
+                placeholder="username"
+                autoCapitalize={"none"}
+                className="border p-3 border-gray-400 rounded-md"
             />
-            
+
             <Pressable
-            onPress={() =>
-                updateProfile({
-                    username,
-                    avatar_url: avatarUrl,
-                    full_name: fullName,
-                })
-            }
-            disabled={loading}
-            className="p-4  bg-blue-400 rounded-md items-center"
+                onPress={() => {
+                    updateProfile({
+                        username,
+                        avatar_url: avatarUrl,
+                        full_name: fullName,
+                    });
+                    router.push({
+                        pathname: "/(tabs)/profile",
+                        params: {
+                            username: username,
+                            full_name: fullName,
+                            avatar_url: avatarUrl,
+                        },
+                    });
+                }}
+                disabled={loading}
+                className="p-4  bg-blue-400 rounded-md items-center"
             >
-            <Text className="font-bold text-white text-lg">Save</Text>
+                <Text className="font-bold text-white text-lg">Save</Text>
             </Pressable>
-            
+
             <Button
-            title="sign out"
-            onPress={() => supabase.auth.signOut()}
+                title="sign out"
+                onPress={() => {
+                    supabase.auth.signOut();
+                    router.replace("/(auth)/login");
+                }}
             ></Button>
         </View>
     );
