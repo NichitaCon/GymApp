@@ -29,7 +29,7 @@ export default function Home() {
         } else {
             setTemplates(data);
         }
-        console.log("data, ", data, error);
+        console.log("templates data: ", JSON.stringify(data), "error: ", JSON.stringify(error));
     };
 
     console.log(templates);

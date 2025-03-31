@@ -7,7 +7,7 @@ import { supabase } from '~/utils/supabase';
 export default function ExerciseListItem({ exercise, routineId }) {
     return (
         <Link href={`/exercise/${exercise.exercise_id}?routineId=${routineId}`} asChild>
-            <Pressable className="p-3 border border-gray-200 bg-gray-100">
+            <Pressable className="p-4 bg-gray-100">
                 <View className="flex-row">
                     <View className="flex-1">
                         {/* <Text>routine id = {routineId}</Text> */}

@@ -19,7 +19,7 @@ export default function RoutineListItem({ template }) {
             <Pressable className="p-4 mb-3 border rounded-xl border-gray-200 bg-gray-100">
                 <View className="flex-column">
                     <Text className="text-2xl mb-2" numberOfLines={2}>
-                        Endurance routine, {template.template_id}
+                        {template.name}
                         {/* Displaying template name */}
                     </Text>
                     <View className="flex-row justify-between ">

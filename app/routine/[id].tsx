@@ -125,7 +125,7 @@ export default function RoutinePage() {
     }
 
     return (
-        <View className="flex-1 p-3 gap-3 bg-white">
+        <View className="flex-1 p-5 gap-3 bg-white">
             <Stack.Screen
                 options={{
                     title: routine ? routine.name : "Routine",
@@ -143,14 +143,15 @@ export default function RoutinePage() {
                     </View>
                 )}
             /> */}
-
-            <FlatList
-                className="bg-white p-1"
-                data={exercise}
-                renderItem={({ item }) => (
-                    <ExerciseListItem exercise={item} routineId={id} />
-                )}
-            />
+            <View>
+                <FlatList
+                    className="bg-white rounded-xl"
+                    data={exercise}
+                    renderItem={({ item }) => (
+                        <ExerciseListItem exercise={item} routineId={id} />
+                    )}
+                />
+            </View>
             <Link href={`/exercise/exercises?routineId=${id}`} asChild>
                 <Pressable>
                     <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl">
