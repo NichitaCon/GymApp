@@ -33,11 +33,10 @@ export default function ExerciseScreen() {
     const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
-        fetchSetLog();
         fetchWorkoutSession();
         fetchRoutineExercises();
         fetchExercise();
-    }, [exerciseId]);
+    }, [setLog]);
 
     // console.log("routineId = ", routineId);
     // console.log("Workout session = ", JSON.stringify(workoutSession, null, 2));
@@ -118,31 +117,6 @@ export default function ExerciseScreen() {
 
         setLoading(false);
     };
-
-    // const createWorkoutSession = async () => {
-    //     console.log("create WorkoutSession called");
-    //     const { data, error } = await supabase
-    //         .from("workout_sessions")
-    //         .insert([
-    //             {
-    //                 user_id: user.id,
-    //                 routine_id: routineId,
-    //                 end_time: null,
-    //                 notes: null,
-    //                 completed: false,
-    //             },
-    //         ])
-    //         .select("session_id"); // Select only session_id to get the ID of the created session
-
-    //     if (error) {
-    //         console.error("Error creating workout session:", error);
-    //         return null; // Return null in case of error
-    //     } else {
-    //         console.log("created workout session: ", data);
-    //         setNewSessionId(data[0].session_id)
-    //         return data[0].session_id; // Return session ID directly
-    //     }
-    // };
 
     const getOrCreateWorkoutSession = async () => {
         console.log("Checking for existing incomplete workout session...");
@@ -239,11 +213,11 @@ export default function ExerciseScreen() {
 
     console.log("newSessionId outside: ", newSessionId);
 
-    if (loading) {
-        return <ActivityIndicator />;
-    }
+    // if (loading) {
+    //     return <ActivityIndicator />;
+    // }
 
-    // console.log("workout session = ", JSON.stringify(workoutSession, null, 2));
+    console.log("setlog = ", JSON.stringify(setLog, null, 2));
     return (
         <View className="flex-1 bg-white p-1">
             <Stack.Screen
@@ -419,7 +393,6 @@ export default function ExerciseScreen() {
                                 onPress={() => {
                                     fetchWorkoutSession();
                                     handleNewSetLogSession();
-                                    fetchSetLog();
                                     setModalVisible(false);
                                 }}
                             >
