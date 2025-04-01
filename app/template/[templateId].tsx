@@ -114,6 +114,7 @@ export default function RoutinePage() {
             console.error("Error inserting routine exercises:", insertError);
         } else {
             console.log("Routine exercises added successfully!");
+            router.replace("/(tabs)");
         }
     };
 
@@ -156,7 +157,7 @@ export default function RoutinePage() {
 
             <Pressable onPress={(() => {
                 insertWorkoutTemplate()
-                router.replace("/(tabs)");
+                
             })}>
                 <Text className="bg-blue-400 p-3 px-4 rounded-full text-center font-semibold text-xl">
                     Add to Workouts
