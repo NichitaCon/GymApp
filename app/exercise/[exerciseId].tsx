@@ -10,8 +10,8 @@ import {
     ScrollView,
     Platform,
 } from "react-native";
-import { Link, Stack, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { Link, Stack, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAuth } from "~/contexts/AuthProvider";
@@ -36,10 +36,16 @@ export default function ExerciseScreen() {
     const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
-        fetchWorkoutSession();
         fetchRoutineExercises();
         fetchExercise();
     }, [setLog]);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchWorkoutSession();
+            console.log("usefocus effect called in id.tsx!")
+        }, []),
+    );
 
     // console.log("routineId = ", routineId);
     // console.log("Workout session = ", JSON.stringify(workoutSession, null, 2));
@@ -291,7 +297,7 @@ export default function ExerciseScreen() {
                                 data={[...item.set_logs].reverse()}
                                 renderItem={({ item: setLogItem }) => (
                                     <Link
-                                        href={`/exercise/setLog/${setLogItem.set_log_id}`}
+                                        href={`/exercise/setLog/${setLogItem.set_log_id}?exercise_name=${encodeURIComponent(exercise.name)}`}
                                         asChild
                                     >
                                         <Pressable className="p-2 flex-row justify-between">
