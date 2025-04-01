@@ -29,13 +29,13 @@ export default function Events() {
     const [description, setDescription] = useState(null);
     const [workoutSession, setWorkoutSession] = useState([]);
 
-    useEffect(() => {
-        fetchRoutines();
-        // console.log("useEffect Triggered in: index.tsx");
-    }, []);
-
+    // useEffect(() => {
+    //     // console.log("useEffect Triggered in: index.tsx");
+    // }, []);
+    
     useFocusEffect(
         useCallback(() => {
+            fetchRoutines();
             fetchWorkoutSession();
             // console.log("usefocus effect called in index.tsx!")
         }, [])

@@ -61,7 +61,7 @@ export default function ExerciseScreen() {
         const { data, error } = await supabase
             .from("exercises")
             .select("*")
-            .eq("exercise_id", setLog?.exercise_id) // Ensure setLog is valid
+            .eq("exercise_id", setLog?.exercise_id)
             .single();
 
         if (error) {
@@ -78,41 +78,28 @@ export default function ExerciseScreen() {
     const updateSetLog = async () => {
         console.log("updateSetLog Called");
         if (!reps || !weight) {
-            // Optionally, handle validation if reps or weight is empty
             console.warn("Reps or weight cannot be empty");
             return;
         }
 
         setLoading(true);
 
-        // Update the set log in the "set_logs" table
         const { data, error } = await supabase
             .from("set_logs")
             .update({
                 reps: reps,
                 weight: weight,
             })
-            .eq("set_log_id", setLogId); // Ensure you're updating the correct set log by its ID
+            .eq("set_log_id", setLogId);
 
         setLoading(false);
 
         if (error) {
             console.error("Error updating set log: ", error.message);
-            // Optionally, show an error message to the user
         } else {
-            if (data.length === 0) {
-                console.warn(
-                    "No rows were updated. This could be because the set_log_id doesn't exist.",
-                );
-            } else if (data.length > 1) {
-                console.warn(
-                    "Multiple rows were updated. This should not happen. Check for duplicate set_log_ids.",
-                );
-            } else {
-                console.log("Set log updated successfully: ", data);
-                // Optionally, navigate back or show a success message
-            }
+            console.log("Set log updated successfully: ", data);
         }
+        router.back();
     };
 
     const deleteSetLog = async () => {
@@ -126,11 +113,9 @@ export default function ExerciseScreen() {
             Alert.alert("Error", "Failed to delete the set log.");
             setLoading(false);
         } else {
-            // Successfully deleted
-            Alert.alert("Success", "Set log deleted successfully.");
+            // Alert.alert("Success", "Set log deleted successfully.");
             setLoading(false);
-            // Optionally, navigate back or refresh the screen after deletion
-            router.back(); // Go back to the previous screen (e.g., [id].tsx)
+            router.back();
         }
     };
 
@@ -175,7 +160,7 @@ export default function ExerciseScreen() {
                 <Pressable
                     onPress={() => {
                         deleteSetLog();
-                        console.log("delete pressed")
+                        console.log("delete pressed");
                     }}
                     className="flex-1"
                 >
@@ -187,7 +172,6 @@ export default function ExerciseScreen() {
                 <Pressable
                     onPress={() => {
                         updateSetLog();
-                        router.back();
                         console.log("Save pressed");
                     }}
                     className="flex-1"

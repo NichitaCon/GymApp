@@ -218,7 +218,7 @@ export default function ExerciseScreen() {
         }
         console.log("session id inside handle: ", sessionId);
         await createSetLog(sessionId || newSessionId); // Pass sessionId directly to createSetLog
-        await fetchSetLog();
+        await fetchWorkoutSession();
     };
 
     console.log("newSessionId outside: ", newSessionId);

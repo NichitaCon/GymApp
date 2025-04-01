@@ -1,4 +1,4 @@
-import { useLocalSearchParams, Stack, Link } from "expo-router";
+import { useLocalSearchParams, Stack, Link, router } from "expo-router";
 import {
     View,
     Text,
@@ -156,6 +156,7 @@ export default function RoutinePage() {
 
             <Pressable onPress={(() => {
                 insertWorkoutTemplate()
+                router.replace("/(tabs)");
             })}>
                 <Text className="bg-blue-400 p-3 px-4 rounded-full text-center font-semibold text-xl">
                     Add to Workouts
