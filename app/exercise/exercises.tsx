@@ -4,6 +4,7 @@ import {
     Pressable,
     FlatList,
     ActivityIndicator,
+    TextInput,
 } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import {
@@ -23,10 +24,13 @@ export default function Exercises() {
     const [allExercises, setAllExercises] = useState([]);
     const [routineExercises, setRoutineExercises] = useState([]);
     const [selectedExercises, setSelectedExercises] = useState<number[]>([]);
+
+    const [searchQuery, setSearchQuery] = useState("");
+
     const [loading, setLoading] = useState(false);
 
     if (loading) {
-        console.log("LOADING")
+        console.log("LOADING");
         return <ActivityIndicator />;
     }
 
@@ -107,7 +111,7 @@ export default function Exercises() {
     };
 
     const updateRoutineExercises = async () => {
-        console.log("starting updateRoutineExercises function")
+        console.log("starting updateRoutineExercises function");
         setLoading(true);
         // Find exercises to delete (that were previously selected but are no longer selected)
         const exercisesToRemove = routineExercises.filter(
@@ -153,20 +157,31 @@ export default function Exercises() {
             console.error("Error adding/updating exercises:", insertError);
             return;
         }
-        setLoading(false)
+        setLoading(false);
         console.log("Routine exercises updated successfully:");
     };
 
-
+    const filteredExercises = allExercises.filter((exercise) =>
+        exercise.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
 
     return (
         <View className="flex-1 p-5 bg-white pb-safe-offset-0">
             <Stack.Screen options={{ title: "Exercises" }} />
+
             {/* <Text className="text-4xl mb-5 text-center">Exercises</Text> */}
 
             {/* <Text>routine id = {routineId}</Text> */}
+
+            <TextInput
+                className="bg-gray-100 rounded-lg mb-5 p-4 border-2 border-gray-300"
+                placeholder="Search Exercises"
+                placeholderTextColor={"black"}
+                onChangeText={setSearchQuery}
+                value={searchQuery}
+            />
             <FlatList
-                data={allExercises}
+                data={filteredExercises}
                 renderItem={({ item }) => (
                     <Pressable
                         onPress={() =>
@@ -179,6 +194,14 @@ export default function Exercises() {
                         } rounded-lg mb-3 p-3`}
                     >
                         <Text className="text-xl">{item.name}</Text>
+                    </Pressable>
+                )}
+                ListFooterComponent={() => (
+                    <Pressable
+                        onPress={() => console.log("Add exercise pressed")}
+                        className="bg-gray-100 rounded-lg mb-3 p-3"
+                    >
+                        <Text className="text-xl text-center">test</Text>
                     </Pressable>
                 )}
             />
@@ -196,10 +219,9 @@ export default function Exercises() {
                 <Pressable
                     className="p-3 px-4 rounded-lg bg-gray-200"
                     onPress={() => {
-                        // createRoutineExercises();
                         updateRoutineExercises();
-                        console.log("router back")
-                        router.setParams({ updated: 3})
+                        console.log("router back");
+
                         router.back();
                     }}
                 >
