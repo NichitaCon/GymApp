@@ -5,6 +5,10 @@ import {
     FlatList,
     ActivityIndicator,
     TextInput,
+    KeyboardAvoidingView,
+    Modal,
+    ScrollView,
+    Platform,
 } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import {
@@ -17,15 +21,19 @@ import {
 import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
 import React from "react";
+import { useAuth } from "~/contexts/AuthProvider";
 
 export default function Exercises() {
     const { routineId } = useLocalSearchParams();
+    const { user } = useAuth();
 
     const [allExercises, setAllExercises] = useState([]);
     const [routineExercises, setRoutineExercises] = useState([]);
     const [selectedExercises, setSelectedExercises] = useState<number[]>([]);
+    const [modalVisible, setModalVisible] = useState(false);
 
     const [searchQuery, setSearchQuery] = useState("");
+    const [newExerciseName, setNewExerciseName] = useState("");
 
     const [loading, setLoading] = useState(false);
 
@@ -110,6 +118,18 @@ export default function Exercises() {
         }
     };
 
+    const createNewExercise = async () => {
+        const { data, error } = await supabase
+            .from("exercises")
+            .insert([{ creator_id: user.id, name: newExerciseName }])
+            .select();
+
+        if (error) {
+            console.log("error creating exercise:", error);
+            return null;
+        }
+    };
+
     const updateRoutineExercises = async () => {
         console.log("starting updateRoutineExercises function");
         setLoading(true);
@@ -161,6 +181,14 @@ export default function Exercises() {
         console.log("Routine exercises updated successfully:");
     };
 
+    const handleCreateExercise = async () => {
+        await createNewExercise();
+        await setNewExerciseName("")
+        await fetchAllExercises();
+        setModalVisible(false);
+
+    };
+
     const filteredExercises = allExercises.filter((exercise) =>
         exercise.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
@@ -177,7 +205,10 @@ export default function Exercises() {
                 className="bg-gray-100 rounded-lg mb-5 p-4 border-2 border-gray-300"
                 placeholder="Search Exercises"
                 placeholderTextColor={"black"}
-                onChangeText={setSearchQuery}
+                onChangeText={(text) => {
+                    setSearchQuery(text);
+                    setNewExerciseName(text);
+                }}
                 value={searchQuery}
             />
             <FlatList
@@ -198,13 +229,73 @@ export default function Exercises() {
                 )}
                 ListFooterComponent={() => (
                     <Pressable
-                        onPress={() => console.log("Add exercise pressed")}
+                        onPress={() => {
+                            setModalVisible(true);
+                            console.log("Add exercise pressed");
+                        }}
                         className="bg-gray-100 rounded-lg mb-3 p-3"
                     >
-                        <Text className="text-xl text-center">test</Text>
+                        <Text className="text-xl text-center">
+                            Create New Exercise
+                        </Text>
                     </Pressable>
                 )}
             />
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+            >
+                <Pressable
+                    onPress={() => setModalVisible(false)}
+                    className="flex-auto justify-end items-center bg-black/20 backdrop-blur-xl"
+                >
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === "ios" ? "padding" : "height"}
+                        className="w-full"
+                    >
+                        <ScrollView
+                            contentContainerStyle={{ flexGrow: 1 }}
+                            keyboardShouldPersistTaps="handled"
+                        >
+                            <Pressable
+                                onPress={() => setModalVisible(true)}
+                                className="bg-white p-6 rounded-lg w-full"
+                            >
+                                <View className="">
+                                    <Text className="text-2xl mb-1">Name</Text>
+                                    <TextInput
+                                        value={newExerciseName}
+                                        onChangeText={(text) =>
+                                            setNewExerciseName(text)
+                                        }
+                                        placeholder="New Exercise Name"
+                                        placeholderTextColor="gray"
+                                        className="mb-4 p-3 rounded-lg bg-gray-200"
+                                    />
+                                </View>
+
+                                <View className="flex-row justify-between">
+                                    <Pressable
+                                        className="p-3 px-4 rounded-lg bg-gray-200"
+                                        onPress={() => setModalVisible(false)}
+                                    >
+                                        <Text className="text-xl">Cancel</Text>
+                                    </Pressable>
+                                    <Pressable
+                                        className="p-3 px-4 rounded-lg bg-gray-200"
+                                        onPress={() => {
+                                            handleCreateExercise();
+                                        }}
+                                    >
+                                        <Text className="text-xl">Save</Text>
+                                    </Pressable>
+                                </View>
+                            </Pressable>
+                        </ScrollView>
+                    </KeyboardAvoidingView>
+                </Pressable>
+            </Modal>
 
             <View className="flex-row justify-between p-3">
                 <Pressable
