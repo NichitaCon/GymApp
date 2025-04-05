@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
 import React from "react";
 import { useAuth } from "~/contexts/AuthProvider";
+import Entypo from "@expo/vector-icons/Entypo";
 
 export default function Exercises() {
     const { routineId } = useLocalSearchParams();
@@ -183,10 +184,9 @@ export default function Exercises() {
 
     const handleCreateExercise = async () => {
         await createNewExercise();
-        await setNewExerciseName("")
+        await setNewExerciseName("");
         await fetchAllExercises();
         setModalVisible(false);
-
     };
 
     const filteredExercises = allExercises.filter((exercise) =>
@@ -233,11 +233,17 @@ export default function Exercises() {
                             setModalVisible(true);
                             console.log("Add exercise pressed");
                         }}
-                        className="bg-gray-100 rounded-lg mb-3 p-3"
+                        className="bg-gray-100 rounded-lg mb-3 mt-4 p-2  flex-row justify-between items-center"
                     >
-                        <Text className="text-xl text-center">
-                            Create New Exercise
-                        </Text>
+                            <Text className="text-xl text-center">
+                                Create New Exercise
+                            </Text>
+                            <Entypo
+                                name="plus"
+                                size={24}
+                                color="black"
+                                className="bg rounded-full p-1"
+                            />
                     </Pressable>
                 )}
             />

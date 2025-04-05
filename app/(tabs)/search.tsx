@@ -1,5 +1,5 @@
-import { Stack } from "expo-router";
-import { useEffect, useState } from "react";
+import { Stack, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { FlatList, StyleSheet, View, Text } from "react-native";
 
 import { ScreenContent } from "~/components/ScreenContent";
@@ -13,6 +13,13 @@ export default function Home() {
     useEffect(() => {
         fetchTemplates();
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchTemplates();
+            console.log("usefocus effect called in id.tsx!");
+        }, []),
+    );
 
     const fetchTemplates = async () => {
         const { data, error } = await supabase
@@ -29,10 +36,15 @@ export default function Home() {
         } else {
             setTemplates(data);
         }
-        console.log("templates data: ", JSON.stringify(data), "error: ", JSON.stringify(error));
+        // console.log(
+        //     "templates data: ",
+        //     JSON.stringify(data),
+        //     "error: ",
+        //     JSON.stringify(error),
+        // );
     };
 
-    console.log(templates);
+    // console.log(templates);
     return (
         <View className="flex-1 bg-white p-5">
             <Stack.Screen options={{ title: "Search" }} />

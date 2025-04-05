@@ -131,7 +131,7 @@ export default function Events() {
             />
 
                 {workoutSession.some(session => !session.completed) && (
-                    <View className="flex-row justify-between items-center">
+                    <View className="flex-row justify-between items-center p-3 pb-0">
                         <Text className="text-green-500 text-2xl">
                             Workout session active
                         </Text>
