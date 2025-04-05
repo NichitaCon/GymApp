@@ -1,8 +1,22 @@
 import Entypo from "@expo/vector-icons/Entypo";
-import { Link, Stack, useGlobalSearchParams, useLocalSearchParams } from "expo-router";
+import {
+    Link,
+    Stack,
+    useGlobalSearchParams,
+    useLocalSearchParams,
+} from "expo-router";
 import React from "react";
 import { useEffect, useState } from "react";
-import { Alert, Button, Pressable, Text, TextInput, View } from "react-native";
+import {
+    Alert,
+    Button,
+    FlatList,
+    Pressable,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
+import TemplateListItem from "~/components/TemplateListItem";
 import { useAuth } from "~/contexts/AuthProvider";
 
 import { supabase } from "~/utils/supabase";
@@ -11,15 +25,16 @@ export default function Profile() {
     const [loading, setLoading] = useState(true);
     const [username, setUsername] = useState("");
     const [fullName, setFullName] = useState("");
-    const [avatarUrl, setAvatarUrl] = useState("");
+    const [templates, setTemplates] = useState([]);
     const [role, setRole] = useState("");
     const { params } = useGlobalSearchParams();
 
-    console.log("router push params in profile.tsx", params)
+    console.log("router push params in profile.tsx", params);
 
     const { session } = useAuth();
 
     useEffect(() => {
+        fetchTemplates();
         if (session) getProfile();
     }, [params]);
 
@@ -39,7 +54,6 @@ export default function Profile() {
 
             if (data) {
                 setUsername(data.username);
-                setAvatarUrl(data.avatar_url);
                 setFullName(data.full_name);
                 setRole(data.role);
             }
@@ -52,26 +66,59 @@ export default function Profile() {
         }
     }
 
+    const fetchTemplates = async () => {
+        const { data, error } = await supabase
+            .from("templates")
+            .select(`*,profiles:profiles (id, full_name, role)`)
+            .eq("creator_id", session?.user.id);
+        if (error) {
+            console.error(
+                "Error reading Templates table with creator name: ",
+                error,
+            );
+            return;
+        } else if (!data || data.length === 0) {
+            console.warn("Templates returned empty.");
+        } else {
+            setTemplates(data);
+        }
+        // console.log(
+        //     "templates data: ",
+        //     JSON.stringify(data),
+        //     "error: ",
+        //     JSON.stringify(error),
+        // );
+    };
+
     return (
         <View className="flex-1 bg-white p-5 gap-3">
             <Stack.Screen options={{ title: "Profile" }} />
-            <View className="flex-row justify-between">
-
-            <View>
-                <Text className="text-5xl">{fullName}</Text>
-                <Text className="text-xl text-gray-500">{username}</Text>
-                <Text className=" text-gray-500">Role: {role}</Text>
+            <View className="flex-row justify-between mb-8">
+                <View>
+                    <Text className="text-5xl">{fullName}</Text>
+                    <Text className="text-xl text-gray-500">{username}</Text>
+                    <Text className=" text-gray-500">Role: {role}</Text>
+                </View>
+                <Link href={`/profile/profileSettings`} asChild>
+                    <Pressable>
+                        <Entypo
+                            name="cog"
+                            size={24}
+                            color="black"
+                            className="bg-blue-400 p-3 rounded-full"
+                        />
+                    </Pressable>
+                </Link>
             </View>
-            <Link href={`/profile/profileSettings`} asChild>
-                <Pressable>
-                    <Entypo
-                        name="cog"
-                        size={24}
-                        color="black"
-                        className="bg-blue-400 p-3 rounded-full"
-                    />
-                </Pressable>
-            </Link>
+            <View>
+                <Text className="text-4xl">Created Templates:</Text>
+                <FlatList
+                    className="bg-white p-1 h-1/2"
+                    data={templates}
+                    renderItem={({ item }) => (
+                        <TemplateListItem template={item} />
+                    )}
+                />
             </View>
         </View>
     );

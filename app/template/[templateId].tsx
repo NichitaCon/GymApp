@@ -179,7 +179,7 @@ export default function RoutinePage() {
 
             {template.description ? (
                 <View>
-                    <Text className="text-2xl">Description:</Text>
+                    {/* <Text className="text-2xl">Description:</Text> */}
                     <Text className="text-3xl">{template.description}</Text>
                 </View>
             ) : (
@@ -189,10 +189,10 @@ export default function RoutinePage() {
             <View>
                 <Text className="text-2xl">Exercises:</Text>
                 <FlatList
-                    className="bg-white p-1"
+                    className="bg-white p-1 rounded-3xl"
                     data={templateExercise}
                     renderItem={({ item }) => (
-                        <View className="flex-row p-3 border border-gray-200 bg-gray-100">
+                        <View className="flex-row p-4 border-gray-200 bg-gray-100">
                             <View className="flex-1">
                                 <Text className="text-2xl" numberOfLines={1}>
                                     {item.exercises.name}
