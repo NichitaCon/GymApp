@@ -2,10 +2,11 @@ import Entypo from "@expo/vector-icons/Entypo";
 import {
     Link,
     Stack,
+    useFocusEffect,
     useGlobalSearchParams,
     useLocalSearchParams,
 } from "expo-router";
-import React from "react";
+import React, { useCallback } from "react";
 import { useEffect, useState } from "react";
 import {
     Alert,
@@ -37,6 +38,13 @@ export default function Profile() {
         fetchTemplates();
         if (session) getProfile();
     }, [params]);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchTemplates();
+            console.log("usefocus effect called in id.tsx!");
+        }, []),
+    );
 
     async function getProfile() {
         try {

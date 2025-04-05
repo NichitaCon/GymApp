@@ -31,17 +31,6 @@ export default function Auth() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
-    async function signInWithEmail() {
-        setLoading(true);
-        const { error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password,
-        });
-
-        if (error) Alert.alert(error.message);
-        setLoading(false);
-    }
-
     async function signUpWithEmail() {
         setLoading(true);
 
@@ -91,7 +80,7 @@ export default function Auth() {
 
     return (
         <View className="flex-1 gap-3 p-5 pt-10 bg-white">
-            <Stack.Screen options={{ title: "Log in" }} />
+            <Stack.Screen options={{ title: "Sign up" }} />
 
             {/* <Text className="text-4xl">Welcome to my app!</Text> */}
             <View className="gap-1">
@@ -102,6 +91,17 @@ export default function Auth() {
                     placeholder="email@address.com"
                     autoCapitalize={"none"}
                     className=" p-4 bg-gray-200 rounded-md"
+                />
+            </View>
+
+            <View className="gap-1">
+                <Text className="text-2xl">Name:</Text>
+                <TextInput
+                    onChangeText={(text) => setName(text)}
+                    value={name}
+                    placeholder="Name"
+                    autoCapitalize={"none"}
+                    className="p-4 bg-gray-200 rounded-md"
                 />
             </View>
 
@@ -118,13 +118,14 @@ export default function Auth() {
             </View>
 
             <View className="flex-row gap-3">
+
                 <Pressable
-                    onPress={() => signInWithEmail()}
+                    onPress={() => signUpWithEmail()}
                     disabled={loading}
-                    className="p-4 flex-1 border border-gray-400 rounded-md items-center"
+                    className="p-4 flex-1 bg-blue-400 rounded-md items-center"
                 >
-                    <Text className="font-bold text-gray-600 text-lg">
-                        Log in
+                    <Text className="font-bold text-white text-lg">
+                        Sign up
                     </Text>
                 </Pressable>
             </View>
