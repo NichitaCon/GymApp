@@ -1,6 +1,7 @@
 import "../global.css";
 
 import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 import AuthProvider from "~/contexts/AuthProvider";
 
@@ -12,6 +13,7 @@ export const unstable_settings = {
 export default function RootLayout() {
     return (
         <AuthProvider>
+                  <StatusBar style="dark" />
             <Stack
                 screenOptions={{
                     tabBarActiveTintColor: "black",

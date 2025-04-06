@@ -4,6 +4,7 @@ import { HeaderButton } from "../../components/HeaderButton";
 import { TabBarIcon } from "../../components/TabBarIcon";
 
 import { useAuth } from "~/contexts/AuthProvider";
+import { StatusBar } from "react-native";
 
 export default function TabLayout() {
     const { isAuthenticated } = useAuth();
@@ -19,6 +20,8 @@ export default function TabLayout() {
                 headerShown: false, // Hides the header for all screens
             }}
         >
+            <StatusBar style="dark" />
+
             <Tabs.Screen
                 name="index"
                 options={{
