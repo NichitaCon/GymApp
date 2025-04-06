@@ -17,6 +17,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { useAuth } from "~/contexts/AuthProvider";
 import dayjs from "dayjs";
 import Tip from "~/components/Tip";
+import Header from "~/components/Header";
 
 export default function ExerciseScreen() {
     const { exerciseId, routineId } = useLocalSearchParams(); // Get exercise ID
@@ -238,6 +239,7 @@ export default function ExerciseScreen() {
                     headerBackTitle: "Home",
                 }}
             />
+            <Header header={exercise ? exercise.name : "Exercise"}/>
             {workoutSession.length === 0 && (
                 <View className="mb-3 gap-4">
                     <Tip

@@ -12,6 +12,7 @@ import {
 import { Stack } from "expo-router";
 
 import { supabase } from "../../utils/supabase";
+import Header from "~/components/Header";
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
@@ -92,6 +93,8 @@ export default function Auth() {
     return (
         <View className="flex-1 gap-3 p-5 pt-10 bg-white">
             <Stack.Screen options={{ title: "Log in" }} />
+
+            <Header header={"Log in"}/>
 
             {/* <Text className="text-4xl">Welcome to my app!</Text> */}
             <View className="gap-1">

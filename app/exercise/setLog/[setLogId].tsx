@@ -10,6 +10,7 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
 import { useAuth } from "~/contexts/AuthProvider";
+import Header from "~/components/Header";
 
 export default function ExerciseScreen() {
     const { setLogId, exercise_name } = useLocalSearchParams(); // Get exercise ID
@@ -132,8 +133,9 @@ export default function ExerciseScreen() {
                     headerBackTitle: "Home",
                 }}
             />
+            <Header header={"Edit Log"}/>
             {/* Safeguard against missing exercise data */}
-            <Text className="text-5xl mb-4">{exercise_name}</Text>
+            <Text className="text-4xl mb-4">{exercise_name}</Text>
             <View className="mb-2">
                 <Text className="text-2xl mb-1">Reps</Text>
                 <TextInput

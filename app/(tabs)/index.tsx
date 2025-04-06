@@ -19,6 +19,7 @@ import { useAuth } from "~/contexts/AuthProvider";
 
 import Entypo from "@expo/vector-icons/Entypo";
 import Tip from "~/components/Tip";
+import Header from "~/components/Header";
 
 export default function Events() {
     const [routines, setRoutines] = useState([]);
@@ -110,8 +111,9 @@ export default function Events() {
         <View className="flex-1 bg-white p-5">
             <Stack.Screen options={{ title: "Home" }} />
 
+            <Header header={"Home"}/>
             <View className="flex-row justify-between items-center mb-4">
-                <Text className="text-5xl">Workouts</Text>
+                <Text className="text-4xl">Workouts</Text>
                 <Pressable onPress={() => setModalVisible(true)}>
                     <Entypo
                         name="plus"
@@ -207,7 +209,7 @@ export default function Events() {
                                 <TextInput
                                     value={name}
                                     onChangeText={(text) => setName(text)}
-                                    placeholder="Workout Name"
+                                    placeholder="Workout Name (e.g. 'Push day' 'Leg day')"
                                     placeholderTextColor="gray"
                                     className="mb-4 p-3 rounded-lg bg-gray-200"
                                 />

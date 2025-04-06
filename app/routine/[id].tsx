@@ -19,6 +19,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import Exercises from "../exercise/exercises";
 import React from "react";
 import Tip from "~/components/Tip";
+import Header from "~/components/Header";
 
 export default function RoutinePage() {
     const { id, updated } = useLocalSearchParams();
@@ -190,8 +191,9 @@ export default function RoutinePage() {
                     headerBackTitle: "Home",
                 }}
             />
+            <Header header={routine ? routine.name : "Routine"} />
 
-            {exercise.length === 0 && (
+            {exercise?.length === 0 && (
                 <View className="">
                     <Tip
                         title={"Adding exercises to your workout"}
@@ -204,15 +206,13 @@ export default function RoutinePage() {
                     />
                 </View>
             )}
-            <View>
-                <FlatList
-                    className="bg-white rounded-xl"
-                    data={exercise}
-                    renderItem={({ item }) => (
-                        <ExerciseListItem exercise={item} routineId={id} />
-                    )}
-                />
-            </View>
+            <FlatList
+                className="bg-white rounded-xl"
+                data={exercise}
+                renderItem={({ item }) => (
+                    <ExerciseListItem exercise={item} routineId={id} />
+                )}
+            />
 
             <Link href={`/exercise/exercises?routineId=${id}`} asChild>
                 <Pressable>
@@ -225,13 +225,13 @@ export default function RoutinePage() {
                 exercise &&
                 exercise.length > 0 && (
                     <Pressable onPress={() => insertTemplateRoutine()}>
-                        <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl">
+                        <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl mb-3">
                             Create Template
                         </Text>
                     </Pressable>
                 )
             ) : (
-                <Text className="text-center text-gray-400">
+                <Text className="text-center text-gray-400 mb-3">
                     This routine exists as a template
                 </Text>
             )}

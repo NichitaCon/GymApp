@@ -19,6 +19,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import Exercises from "../exercise/exercises";
 import { useFocusEffect } from "@react-navigation/native";
 import React from "react";
+import Header from "~/components/Header";
 
 export default function RoutinePage() {
     const { templateId } = useLocalSearchParams();
@@ -114,7 +115,7 @@ export default function RoutinePage() {
             return;
         }
 
-        console.log("inserted routine data = ", routineData)
+        console.log("inserted routine data = ", routineData);
 
         const routineId = routineData.routine_id;
         console.log("New routine created with ID:", routineId);
@@ -179,7 +180,20 @@ export default function RoutinePage() {
                     headerBackTitle: "Home",
                 }}
             />
-
+            <View className="flex-row justify-between items-center">
+                <Header header={"Template"} />
+                {(template.creator_id === user.id ||
+                    userRole.role === "Admin") && (
+                    <Pressable className="bg-red-300 p-4 rounded-full mt-3" onPress={() => setModalVisible(true)}>
+                        <Entypo
+                            name="trash"
+                            size={24}
+                            color="black"
+                            className="justify-end"
+                        />
+                    </Pressable>
+                )}
+            </View>
             {template.description ? (
                 <View>
                     {/* <Text className="text-2xl">Description:</Text> */}
@@ -217,13 +231,7 @@ export default function RoutinePage() {
                     Add to Workouts
                 </Text>
             </Pressable>
-            {(template.creator_id === user.id || userRole.role === "Admin") && (
-                <Pressable onPress={() => setModalVisible(true)}>
-                    <Text className="bg-blue-300 p-3 px-4 rounded-full text-center font-semibold text-xl">
-                        Delete Routine
-                    </Text>
-                </Pressable>
-            )}
+
             {/* <Link href={`/exercise/exercises?routineId=${id}`} asChild>
             <Pressable>
             <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl">

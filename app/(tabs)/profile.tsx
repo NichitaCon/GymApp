@@ -17,6 +17,7 @@ import {
     TextInput,
     View,
 } from "react-native";
+import Header from "~/components/Header";
 import TemplateListItem from "~/components/TemplateListItem";
 import { useAuth } from "~/contexts/AuthProvider";
 
@@ -42,6 +43,7 @@ export default function Profile() {
     useFocusEffect(
         useCallback(() => {
             fetchTemplates();
+            if (session) getProfile();
             console.log("usefocus effect called in id.tsx!");
         }, []),
     );
@@ -101,10 +103,10 @@ export default function Profile() {
     return (
         <View className="flex-1 bg-white p-5 gap-3">
             <Stack.Screen options={{ title: "Profile" }} />
+            <Header header={"Profile"} />
             <View className="flex-row justify-between mb-8">
                 <View>
-                    <Text className="text-5xl">{fullName}</Text>
-                    <Text className="text-xl text-gray-500">{username}</Text>
+                    <Text className="text-4xl">{fullName}</Text>
                     <Text className=" text-gray-500">Role: {role}</Text>
                 </View>
                 <Link href={`/profile/profileSettings`} asChild>
@@ -121,9 +123,11 @@ export default function Profile() {
             <View>
                 <Text className="text-4xl">Created Templates:</Text>
                 {templates.length === 0 && (
-                    <Text className="mt-3 text-gray-700">
-                        You havent created any templates... yet ;)
-                    </Text>
+                    <View className="p-3 mt-3 rounded-xl bg-gray-200">
+                        <Text className=" text-gray-700">
+                            You havent created any templates
+                        </Text>
+                    </View>
                 )}
                 <FlatList
                     className="bg-white p-1 h-1/2"

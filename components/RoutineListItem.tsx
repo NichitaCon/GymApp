@@ -18,7 +18,7 @@ export default function RoutineListItem({ routine, onRoutineDeleted }) {
         <Link href={`/routine/${routine.routine_id}`} asChild>
             <Pressable className="p-4 mb-3 border rounded-xl border-gray-200 bg-gray-100">
                 <View className="flex-row justify-between items-center">
-                    <Text className="text-2xl" numberOfLines={2}>
+                    <Text className="text-2xl w-4/5" numberOfLines={1}>
                         {routine.name}
                         {/* Displaying routine name */}
                     </Text>
