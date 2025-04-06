@@ -16,6 +16,7 @@ import { supabase } from "~/utils/supabase";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAuth } from "~/contexts/AuthProvider";
 import dayjs from "dayjs";
+import Tip from "~/components/Tip";
 
 export default function ExerciseScreen() {
     const { exerciseId, routineId } = useLocalSearchParams(); // Get exercise ID
@@ -43,7 +44,7 @@ export default function ExerciseScreen() {
     useFocusEffect(
         useCallback(() => {
             fetchWorkoutSession();
-            console.log("usefocus effect called in id.tsx!")
+            console.log("usefocus effect called in id.tsx!");
         }, []),
     );
 
@@ -229,7 +230,7 @@ export default function ExerciseScreen() {
 
     console.log("setlog = ", JSON.stringify(setLog, null, 2));
     return (
-        <View className="flex-1 bg-white p-1">
+        <View className="flex-1 bg-white p-5">
             <Stack.Screen
                 options={{
                     title: exercise ? exercise.name : "Exercise",
@@ -237,52 +238,33 @@ export default function ExerciseScreen() {
                     headerBackTitle: "Home",
                 }}
             />
-            {/* <Text>routine id = {routineId}</Text>
-            <Text style={{ fontSize: 24 }}>Exercise ID: {exerciseId}</Text>
-            <Text style={{ fontSize: 24 }}>Exercise name: {exercise.name}</Text> */}
-
-            {/* <FlatList
-                data={workoutSession}
-                renderItem={({ item }) => (
-                    <View className="p-2">
-                        <Text>session ID: {item.session_id}</Text>
-                        <Text>routine ID: {item.routine_id}</Text>
-                        <Text>reps: {item.set_logs.reps}</Text>
-                    </View>
-                )}
-            /> */}
-
-            {/* <FlatList
-                className=""
-                data={workoutSession}
-                renderItem={({ item }) => (
-                    <View className="p-4">
-                        <Text className="text-2xl mb-1 font-semibold">
-                            Session {item.session_id}
-                        </Text>
-                        <FlatList
-                            className="gap-3 rounded-xl p-2 bg-gray-100"
-                            data={setLog}
-                            renderItem={({ item: setLogItem }) => (
-                                <View className="p-2 flex-row justify-between border-b border-gray-300 ">
-                                    <Text className="text-2xl">
-                                    
-                                        {setLogItem.reps} Reps
-                                    </Text>
-                                    <Text className="text-2xl">
-                                        {setLogItem.weight} Kg
-                                    </Text>
-                                </View>
-                            )}
-                        />
-                    </View>
-                )}
-            /> */}
+            {workoutSession.length === 0 && (
+                <View className="mb-3 gap-4">
+                    <Tip
+                        title={"Logging your sets"}
+                        text1={
+                            "Here, you log how many reps and the weight you've done for a set. "
+                        }
+                        text2={
+                            "If you need to edit the log, you can click into it and make changes directly from there."
+                        }
+                    />
+                    <Tip
+                        title={"Sessions"}
+                        text1={
+                            "When you log your first exercise of the day, your session begins. To save your workout logs for the day, head to the home page and end the session once you're done."
+                        }
+                        text2={
+                            undefined
+                        }
+                    />
+                </View>
+            )}
 
             <FlatList
                 data={workoutSession}
                 renderItem={({ item }) => (
-                    <View className="p-4">
+                    <View className="">
                         <Text className="text-sm text-gray-500">
                             session id: {item.session_id}
                         </Text>

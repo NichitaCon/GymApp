@@ -7,6 +7,9 @@ import {
     Modal,
     Button,
     TextInput,
+    ScrollView,
+    KeyboardAvoidingView,
+    Platform,
 } from "react-native";
 
 import RoutineListItem from "~/components/RoutineListItem";
@@ -15,6 +18,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "~/contexts/AuthProvider";
 
 import Entypo from "@expo/vector-icons/Entypo";
+import Tip from "~/components/Tip";
 
 export default function Events() {
     const [routines, setRoutines] = useState([]);
@@ -25,21 +29,21 @@ export default function Events() {
 
     const [modalVisible, setModalVisible] = useState(false); // state to control modal visibility
 
-    const [name, setName] = useState(null);
-    const [description, setDescription] = useState(null);
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
     const [workoutSession, setWorkoutSession] = useState([]);
 
     // useEffect(() => {
     //     // console.log("useEffect Triggered in: index.tsx");
     // }, []);
-    
+
     useFocusEffect(
         useCallback(() => {
             fetchRoutines();
             fetchWorkoutSession();
             // console.log("usefocus effect called in index.tsx!")
-        }, [])
-      );
+        }, []),
+    );
 
     const fetchRoutines = async () => {
         const { data, error } = await supabase
@@ -50,7 +54,7 @@ export default function Events() {
     };
 
     const createRoutine = async () => {
-        console.log("Createroutine data before backend: ",name, description);
+        console.log("Createroutine data before backend: ", name, description);
         const { data, error } = await supabase
             .from("routines")
             .insert([
@@ -61,7 +65,6 @@ export default function Events() {
                 },
             ])
             .select();
-
 
         if (error) {
             console.warn("create error = ", error);
@@ -87,7 +90,7 @@ export default function Events() {
     };
 
     const finishWorkoutSession = async () => {
-        console.log("finishworkoutsession called")
+        console.log("finishworkoutsession called");
         const { data, error } = await supabase
             .from("workout_sessions")
             .update({ completed: true, end_time: new Date() })
@@ -119,6 +122,18 @@ export default function Events() {
                 </Pressable>
             </View>
 
+            {routines.length === 0 && (
+                <Tip
+                    title={"Welcome to the Home Page!"}
+                    text1={
+                        "If you're an experienced gym-goer with your own routine, feel free to create a workout plan for the day with the blue plus icon, just add the exercises you're doing."
+                    }
+                    text2={
+                        "If you're new to the gym and unsure where to start, don’t worry! Simply tap the 'Search' button in the bottom bar to explore routines that fit your needs."
+                    }
+                />
+            )}
+
             <FlatList
                 className="bg-white"
                 data={routines}
@@ -130,21 +145,22 @@ export default function Events() {
                 )}
             />
 
-                {workoutSession.some(session => !session.completed) && (
-                    <View className="flex-row justify-between items-center p-3 pb-0">
-                        <Text className="text-green-500 text-2xl">
-                            Workout session active
+            {workoutSession.some((session) => !session.completed) && (
+                <View className="flex-row justify-between items-center p-3 pb-0">
+                    <Text className="text-green-500 text-2xl">
+                        Workout session active
+                    </Text>
+                    <Pressable
+                        onPress={() => {
+                            finishWorkoutSession();
+                        }}
+                    >
+                        <Text className="bg-blue-400 p-2 px-4 rounded-full text-center font-semibold text-xl">
+                            Finish
                         </Text>
-                        <Pressable onPress={() => {
-                            finishWorkoutSession()
-                        }}>
-                            <Text className="bg-blue-400 p-2 px-4 rounded-full text-center font-semibold text-xl">
-                                Finish
-                            </Text>
-                        </Pressable>
-                    </View>
-                )}
-
+                    </Pressable>
+                </View>
+            )}
 
             <Modal
                 animationType="slide"
@@ -157,54 +173,82 @@ export default function Events() {
                     }}
                     className="flex-auto justify-end items-center bg-black/20 backdrop-blur-xl"
                 >
-                    <Pressable
-                        onPress={() => {
-                            setModalVisible(true);
-                        }}
-                        className="bg-white p-6 rounded-lg w-full h-5/6"
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === "ios" ? "padding" : "height"}
+                        className="w-full"
                     >
-                        <Text className="text-4xl mb-5 text-center">
-                            Add a Workout
-                        </Text>
-
-                        <Text className="text-xl mb-1">Workout</Text>
-                        <TextInput
-                            value={name}
-                            onChangeText={(text) => setName(text)}
-                            placeholder="Workout Name"
-                            placeholderTextColor="gray"
-                            className="mb-4 p-3 rounded-lg bg-gray-200"
-                        />
-
-                        <Text className="text-xl mb-1">Description</Text>
-                        <TextInput
-                            value={description}
-                            onChangeText={(text) => setDescription(text)}
-                            placeholder="Description"
-                            placeholderTextColor="gray"
-                            className="mb-4 p-3 rounded-lg bg-gray-200"
-                        />
-
-                        <View className="flex-row justify-between">
+                        <ScrollView
+                            contentContainerStyle={{ flexGrow: 1 }}
+                            keyboardShouldPersistTaps="handled"
+                        >
                             <Pressable
-                                className="p-3 px-4 rounded-lg bg-gray-200"
                                 onPress={() => {
-                                    setModalVisible(false);
+                                    setModalVisible(true);
                                 }}
+                                className="bg-white p-6 rounded-lg w-full"
                             >
-                                <Text className="text-xl">cancel</Text>
+                                <Text className="text-4xl mb-5 text-center">
+                                    Add a Workout
+                                </Text>
+
+                                {routines.length === 0 && (
+                                    <View className="mb-3">
+                                        <Tip
+                                            title={"Creating a new Workout"}
+                                            text1={
+                                                "Here, you can set up a folder to track the exercises you'll do today. Just give it a name and description, and you’re good to go!"
+                                            }
+                                            text2={undefined}
+                                        />
+                                    </View>
+                                )}
+                                <Text className="text-xl mb-1">Workout</Text>
+
+                                <TextInput
+                                    value={name}
+                                    onChangeText={(text) => setName(text)}
+                                    placeholder="Workout Name"
+                                    placeholderTextColor="gray"
+                                    className="mb-4 p-3 rounded-lg bg-gray-200"
+                                />
+
+                                <Text className="text-xl mb-1">
+                                    Description
+                                </Text>
+                                <TextInput
+                                    value={description}
+                                    onChangeText={(text) =>
+                                        setDescription(text)
+                                    }
+                                    placeholder="Description"
+                                    placeholderTextColor="gray"
+                                    className="mb-6 p-3 rounded-lg bg-gray-200"
+                                />
+
+                                <View className="flex-row justify-between">
+                                    <Pressable
+                                        className="p-3 px-4 rounded-lg bg-gray-200"
+                                        onPress={() => {
+                                            setModalVisible(false);
+                                        }}
+                                    >
+                                        <Text className="text-xl">cancel</Text>
+                                    </Pressable>
+                                    <Pressable
+                                        className="p-3 px-4 rounded-lg bg-gray-200"
+                                        onPress={() => {
+                                            createRoutine();
+                                            setName("");
+                                            setDescription("");
+                                            setModalVisible(false);
+                                        }}
+                                    >
+                                        <Text className="text-xl">Save</Text>
+                                    </Pressable>
+                                </View>
                             </Pressable>
-                            <Pressable
-                                className="p-3 px-4 rounded-lg bg-gray-200"
-                                onPress={() => {
-                                    createRoutine();
-                                    setModalVisible(false);
-                                }}
-                            >
-                                <Text className="text-xl">Save</Text>
-                            </Pressable>
-                        </View>
-                    </Pressable>
+                        </ScrollView>
+                    </KeyboardAvoidingView>
                 </Pressable>
             </Modal>
         </View>

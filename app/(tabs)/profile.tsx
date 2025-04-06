@@ -120,6 +120,11 @@ export default function Profile() {
             </View>
             <View>
                 <Text className="text-4xl">Created Templates:</Text>
+                {templates.length === 0 && (
+                    <Text className="mt-3 text-gray-700">
+                        You havent created any templates... yet ;)
+                    </Text>
+                )}
                 <FlatList
                     className="bg-white p-1 h-1/2"
                     data={templates}

@@ -18,6 +18,7 @@ import ExerciseListItem from "~/components/ExerciseListItem";
 import Entypo from "@expo/vector-icons/Entypo";
 import Exercises from "../exercise/exercises";
 import React from "react";
+import Tip from "~/components/Tip";
 
 export default function RoutinePage() {
     const { id, updated } = useLocalSearchParams();
@@ -50,10 +51,10 @@ export default function RoutinePage() {
 
     useFocusEffect(
         useCallback(() => {
-            fetchExercise()
-            console.log("usefocus effect called in [id].tsx!")
-        }, [])
-      );
+            fetchExercise();
+            console.log("usefocus effect called in [id].tsx!");
+        }, []),
+    );
 
     // useEffect(() => {
     //     fetchExercise();
@@ -143,7 +144,7 @@ export default function RoutinePage() {
             .update({ template_id: templateId })
             .eq("routine_id", id);
 
-            fetchRoutine()
+        fetchRoutine();
 
         const { error: insertError } = await supabase
             .from("template_exercises")
@@ -190,15 +191,19 @@ export default function RoutinePage() {
                 }}
             />
 
-            {/* <FlatList
-                data={exercise}
-                renderItem={({ item }) => (
-                    <View className="p-2">
-                        <Text>Routine ID: {item.routine_id}</Text>
-                        <Text>Exercise ID: {item.exercises.name}</Text>
-                    </View>
-                )}
-            /> */}
+            {exercise.length === 0 && (
+                <View className="">
+                    <Tip
+                        title={"Adding exercises to your workout"}
+                        text1={
+                            "Here, you can store all the exercises for this routine. Click the 'Add Exercises' button to get started."
+                        }
+                        text2={
+                            "Once you've added some exercises, you can click into them to record your sets and view your previous sets. You can also post your exercise list as a template for other users to discover and copy if they like it."
+                        }
+                    />
+                </View>
+            )}
             <View>
                 <FlatList
                     className="bg-white rounded-xl"
@@ -208,17 +213,17 @@ export default function RoutinePage() {
                     )}
                 />
             </View>
+
             <Link href={`/exercise/exercises?routineId=${id}`} asChild>
                 <Pressable>
                     <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl">
                         Add Exercises
                     </Text>
                 </Pressable>
-                {/* <Exercises updateExerciseList={updateExerciseList} /> */}
             </Link>
-            {/* <Link href={`/search`} asChild> */}
             {routine.template_id === null ? (
-                exercise && exercise.length > 0 && (
+                exercise &&
+                exercise.length > 0 && (
                     <Pressable onPress={() => insertTemplateRoutine()}>
                         <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl">
                             Create Template
@@ -226,10 +231,10 @@ export default function RoutinePage() {
                     </Pressable>
                 )
             ) : (
-                <Text className="text-center text-gray-400">This routine exists as a template</Text>
+                <Text className="text-center text-gray-400">
+                    This routine exists as a template
+                </Text>
             )}
-            {/* <Exercises updateExerciseList={updateExerciseList} /> */}
-            {/* </Link> */}
         </View>
     );
 }
