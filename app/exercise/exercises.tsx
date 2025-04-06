@@ -274,7 +274,7 @@ export default function Exercises() {
                                 className="bg-white p-6 rounded-lg w-full"
                             >
                                 <View className="">
-                                    <Text className="text-2xl mb-1">Name</Text>
+                                    <Text className="text-3xl mb-1">New exercise Name:</Text>
                                     <TextInput
                                         value={newExerciseName}
                                         onChangeText={(text) =>

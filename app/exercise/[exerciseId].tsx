@@ -301,7 +301,7 @@ export default function ExerciseScreen() {
             />
 
             {workoutSession.some((session) => !session.completed) && (
-                <Text className="text-green-500 text-xl">
+                <Text className="text-green-500 text-xl text-center mb-2">
                     Workout session active
                 </Text>
             )}

@@ -1,6 +1,6 @@
 import { Stack, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { FlatList, StyleSheet, View, Text } from "react-native";
+import { FlatList, StyleSheet, View, Text, TextInput } from "react-native";
 
 import { ScreenContent } from "~/components/ScreenContent";
 import TemplateListItem from "~/components/TemplateListItem";
@@ -9,6 +9,7 @@ import { supabase } from "~/utils/supabase";
 export default function Home() {
     const [loading, setLoading] = useState(false);
     const [templates, setTemplates] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         fetchTemplates();
@@ -44,11 +45,23 @@ export default function Home() {
         // );
     };
 
+    const filteredTemplates = templates.filter((template) =>
+        template.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+
     // console.log(templates);
     return (
         <View className="flex-1 bg-white p-5">
             <Stack.Screen options={{ title: "Search" }} />
-
+            <TextInput
+                className="bg-gray-100 rounded-xl mb-5 p-4 border-2 border-gray-300"
+                placeholder="Search"
+                placeholderTextColor={"black"}
+                onChangeText={(text) => {
+                    setSearchQuery(text);
+                }}
+                value={searchQuery}
+            />
             {/* <ScreenContent path="app/(tabs)/two.tsx" title="Search" /> */}
             {/* 
             <FlatList
@@ -64,7 +77,7 @@ export default function Home() {
 
             <FlatList
                 className="bg-white p-1"
-                data={templates}
+                data={filteredTemplates}
                 renderItem={({ item }) => <TemplateListItem template={item} />}
             />
         </View>
