@@ -100,18 +100,21 @@ export default function RoutinePage() {
             .from("routines")
             .insert([
                 {
+                    template_id: templateId,
                     user_id: user.id,
                     name: template.name,
                     description: template.description,
                 },
             ])
-            .select("routine_id")
+            .select("*")
             .single();
 
         if (routineError) {
             console.error("Error creating routine:", routineError);
             return;
         }
+
+        console.log("inserted routine data = ", routineData)
 
         const routineId = routineData.routine_id;
         console.log("New routine created with ID:", routineId);

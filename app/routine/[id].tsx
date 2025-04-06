@@ -1,4 +1,4 @@
-import { useLocalSearchParams, Stack, Link } from "expo-router";
+import { useLocalSearchParams, Stack, Link, useFocusEffect } from "expo-router";
 import {
     View,
     Text,
@@ -11,13 +11,12 @@ import {
 } from "react-native";
 
 import { supabase } from "~/utils/supabase";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "~/contexts/AuthProvider";
 import RoutineListItem from "~/components/RoutineListItem";
 import ExerciseListItem from "~/components/ExerciseListItem";
 import Entypo from "@expo/vector-icons/Entypo";
 import Exercises from "../exercise/exercises";
-import { useFocusEffect } from "@react-navigation/native";
 import React from "react";
 
 export default function RoutinePage() {
@@ -47,11 +46,14 @@ export default function RoutinePage() {
         console.log("useEffect Triggered in: [id]1.tsx");
     }, [id]);
 
-    console.log(exercise);
+    // console.log(exercise);
 
-    const updateExerciseList = () => {
-        fetchRoutineExercise(); // Re-fetch the exercises
-    };
+    useFocusEffect(
+        useCallback(() => {
+            fetchExercise()
+            console.log("usefocus effect called in [id].tsx!")
+        }, [])
+      );
 
     // useEffect(() => {
     //     fetchExercise();
@@ -168,7 +170,7 @@ export default function RoutinePage() {
     //     }, []),
     // );
 
-    console.log("fetchexercise from routinerxercise = ",exercise)
+    // console.log("fetchexercise from routinerxercise = ",exercise)
 
     if (loading) {
         return <ActivityIndicator />;

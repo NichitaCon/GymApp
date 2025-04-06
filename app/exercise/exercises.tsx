@@ -38,11 +38,6 @@ export default function Exercises() {
 
     const [loading, setLoading] = useState(false);
 
-    if (loading) {
-        console.log("LOADING");
-        return <ActivityIndicator />;
-    }
-
     useEffect(() => {
         fetchAllExercises();
         fetchRoutineExercises();
@@ -50,6 +45,10 @@ export default function Exercises() {
         console.log("useEffect Triggered in: exercises.tsx");
     }, [routineId]);
 
+    if (loading) {
+        console.log("LOADING");
+        return <ActivityIndicator />;
+    }
     // console.log("exerciseObjArray = ",exerciseObjArray)
     // console.log("Routine id exercises.tsx = ", routineId);
     console.log("selected exercises = ", selectedExercises);
@@ -189,6 +188,12 @@ export default function Exercises() {
         setModalVisible(false);
     };
 
+    const saveAndNavigateBack = async () => {
+        await updateRoutineExercises();
+        console.log("router.back");
+        router.back();
+    };
+
     const filteredExercises = allExercises.filter((exercise) =>
         exercise.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
@@ -235,15 +240,15 @@ export default function Exercises() {
                         }}
                         className="bg-gray-100 rounded-lg mb-3 mt-4 p-2  flex-row justify-between items-center"
                     >
-                            <Text className="text-xl text-center">
-                                Create New Exercise
-                            </Text>
-                            <Entypo
-                                name="plus"
-                                size={24}
-                                color="black"
-                                className="bg rounded-full p-1"
-                            />
+                        <Text className="text-xl text-center">
+                            Create New Exercise
+                        </Text>
+                        <Entypo
+                            name="plus"
+                            size={24}
+                            color="black"
+                            className="bg rounded-full p-1"
+                        />
                     </Pressable>
                 )}
             />
@@ -316,10 +321,7 @@ export default function Exercises() {
                 <Pressable
                     className="p-3 px-4 rounded-lg bg-gray-200"
                     onPress={() => {
-                        updateRoutineExercises();
-                        console.log("router back");
-
-                        router.back();
+                        saveAndNavigateBack();
                     }}
                 >
                     <Text className="text-xl">Save</Text>
