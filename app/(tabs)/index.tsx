@@ -111,7 +111,7 @@ export default function Events() {
         <View className="flex-1 bg-white p-5">
             <Stack.Screen options={{ title: "Home" }} />
 
-            <Header header={"Home"}/>
+            <Header header={"Home"} back={false}/>
             <View className="flex-row justify-between items-center mb-4">
                 <Text className="text-4xl">Workouts</Text>
                 <Pressable onPress={() => setModalVisible(true)}>

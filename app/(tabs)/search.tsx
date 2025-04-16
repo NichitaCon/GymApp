@@ -54,7 +54,7 @@ export default function Home() {
     return (
         <View className="flex-1 bg-white p-5">
             <Stack.Screen options={{ title: "Search" }} />
-            <Header header={"Search"}/>
+            <Header header={"Search"} back={false}/>
             <TextInput
                 className="bg-gray-100 rounded-xl mb-5 p-4 border-2 border-gray-300"
                 placeholder="Search"
