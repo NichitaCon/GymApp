@@ -20,6 +20,7 @@ import { useAuth } from "~/contexts/AuthProvider";
 import Entypo from "@expo/vector-icons/Entypo";
 import Tip from "~/components/Tip";
 import Header from "~/components/Header";
+import { FinishButton } from "~/components/FinishSession";
 
 export default function Events() {
     const [routines, setRoutines] = useState([]);
@@ -80,8 +81,8 @@ export default function Events() {
             .from("workout_sessions")
             .select("*, set_logs(*)")
             .eq("user_id", user.id);
-        setWorkoutSession(data);
-        // console.log(data);
+            // console.log(data);
+            setWorkoutSession(data);
 
         if (error) {
             console.warn("setLog error = ", error);
@@ -111,7 +112,7 @@ export default function Events() {
         <View className="flex-1 bg-white p-5">
             <Stack.Screen options={{ title: "Home" }} />
 
-            <Header header={"Home"} back={false}/>
+            <Header header={"Home"} back={false} />
             <View className="flex-row justify-between items-center mb-4">
                 <Text className="text-4xl">Workouts</Text>
                 <Pressable onPress={() => setModalVisible(true)}>
@@ -148,22 +149,26 @@ export default function Events() {
             />
 
             {workoutSession.some((session) => !session.completed) && (
-                <View className="flex-row justify-between items-center p-3 pb-0">
-                    <Text className="text-green-500 text-2xl">
-                        Workout session active
-                    </Text>
-                    <Pressable
-                        onPress={() => {
-                            finishWorkoutSession();
-                        }}
-                    >
-                        <Text className="bg-blue-400 p-2 px-4 rounded-full text-center font-semibold text-xl">
-                            Finish
+                <View>
+                    <View className="flex-row justify-between items-center p-3 pb-0">
+                        <Text className="text-green-500 text-2xl">
+                            Workout session active
                         </Text>
-                    </Pressable>
+                        <Pressable
+                            onPress={() => {
+                                finishWorkoutSession();
+                            }}
+                        >
+                            <Text className="bg-blue-400 p-2 px-4 rounded-full text-center font-semibold text-xl">
+                                Finish
+                            </Text>
+                        </Pressable>
+                    </View>
+
                 </View>
             )}
 
+            <FinishButton />
             <Modal
                 animationType="slide"
                 transparent={true} // Modal background is transparent

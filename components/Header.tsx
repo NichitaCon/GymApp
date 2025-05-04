@@ -9,8 +9,10 @@ import { useState } from "react";
 export default function Header({ header, back }) {
     const insets = useSafeAreaInsets();
     const AdjustedInset = insets.top - 5;
-    const [isBackEnabled, setIsBackEnabled] = useState(back === undefined ? true : back);
-    console.log("insets", AdjustedInset);
+    const [isBackEnabled, setIsBackEnabled] = useState(
+        back === undefined ? true : back,
+    );
+    // console.log("insets", AdjustedInset);
     return (
         <View
             style={{
@@ -20,17 +22,21 @@ export default function Header({ header, back }) {
             }}
             className="pb-5"
         >
-            {isBackEnabled == true && 
-            <Pressable onPress={() => router.back()}>
-                <Entypo
-                    name="chevron-left"
-                    size={36}
-                    color="black"
-                    className="justify-center mb-2 mr-2"
+            {isBackEnabled == true && (
+                <Pressable onPress={() => router.back()}>
+                    <Entypo
+                        name="chevron-left"
+                        size={36}
+                        color="black"
+                        className="justify-center mb-2 mr-2"
                     />
-            </Pressable>
-                }
-            <Text className="text-6xl flex-1" numberOfLines={1} ellipsizeMode="tail">
+                </Pressable>
+            )}
+            <Text
+                className="text-6xl flex-1"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+            >
                 {header}
             </Text>
         </View>

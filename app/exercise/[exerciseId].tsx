@@ -18,6 +18,8 @@ import { useAuth } from "~/contexts/AuthProvider";
 import dayjs from "dayjs";
 import Tip from "~/components/Tip";
 import Header from "~/components/Header";
+import { useSessionStore } from "~/store/sessionStore";
+import { FinishButton } from "~/components/FinishSession";
 
 export default function ExerciseScreen() {
     const { exerciseId, routineId } = useLocalSearchParams(); // Get exercise ID
@@ -28,7 +30,9 @@ export default function ExerciseScreen() {
     const [workoutSession, setWorkoutSession] = useState([]);
     const [routineExercises, setRoutineExercises] = useState([]);
     const [exercise, setExercise] = useState(false);
-    const [newSessionId, setNewSessionId] = useState("");
+
+    const startSession = useSessionStore((state) => state.startSession);
+    const sessionId = useSessionStore((state) => state.sessionId);
 
     const [weight, setWeight] = useState("");
     const [reps, setReps] = useState("");
@@ -207,29 +211,33 @@ export default function ExerciseScreen() {
             ])
             .select("*");
 
-        console.log("create set log data: ", data);
+        // console.log("create set log data: ", data);
         console.log(error);
         fetchSetLog();
     };
 
     // Example function to call both operations sequentially
     const handleNewSetLogSession = async () => {
-        let sessionId = "";
-        if (newSessionId === "") {
-            sessionId = await getOrCreateWorkoutSession(); // Wait for workout session to be created
+        let currentSessionId = sessionId;
+
+        // If no session exists, create one using Zustand's startSession
+        if (!currentSessionId) {
+            currentSessionId = await startSession(user.id, routineId); // This also updates Zustand state
         }
-        console.log("session id inside handle: ", sessionId);
-        await createSetLog(sessionId || newSessionId); // Pass sessionId directly to createSetLog
-        await fetchWorkoutSession();
+
+        console.log("Session ID inside handle: ", currentSessionId);
+
+        await createSetLog(currentSessionId); // Use the session ID whether it was fetched or newly created
+        await fetchWorkoutSession(); // Optional, depending on your app logic
     };
 
-    console.log("newSessionId outside: ", newSessionId);
+    // console.log("newSessionId outside: ", newSessionId);
 
     // if (loading) {
     //     return <ActivityIndicator />;
     // }
 
-    console.log("setlog = ", JSON.stringify(setLog, null, 2));
+    // console.log("setlog = ", JSON.stringify(setLog, null, 2));
     return (
         <View className="flex-1 bg-white p-5">
             <Stack.Screen
@@ -239,7 +247,7 @@ export default function ExerciseScreen() {
                     headerBackTitle: "Home",
                 }}
             />
-            <Header header={exercise ? exercise.name : "Exercise"}/>
+            <Header header={exercise ? exercise.name : "Exercise"} />
             {workoutSession.length === 0 && (
                 <View className="mb-3 gap-4">
                     <Tip
@@ -256,12 +264,24 @@ export default function ExerciseScreen() {
                         text1={
                             "When you log your first exercise of the day, your session begins. To save your workout logs for the day, head to the home page and end the session once you're done."
                         }
-                        text2={
-                            undefined
-                        }
+                        text2={undefined}
                     />
                 </View>
             )}
+
+            <FinishButton />
+            <Pressable
+                onPress={() => console.log("button session id = ", sessionId)}
+                className="p-3 bg-sky-200"
+            >
+                <Text>Console log session id</Text>
+            </Pressable>
+            <Pressable
+                onPress={() => console.log("button session id = ", currentSessionId)}
+                className="p-3 bg-sky-200"
+            >
+                <Text>Console log current session id</Text>
+            </Pressable>
 
             <FlatList
                 data={workoutSession}
