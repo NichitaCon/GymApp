@@ -221,7 +221,8 @@ export default function ExerciseScreen() {
         let currentSessionId = sessionId;
 
         // If no session exists, create one using Zustand's startSession
-        if (!currentSessionId) {
+        if (currentSessionId == null) {
+            console.warn("NO session exists, creating new one IN HandleNewSetLogSession, session id =",sessionId)
             currentSessionId = await startSession(user.id, routineId); // This also updates Zustand state
         }
 
@@ -276,12 +277,6 @@ export default function ExerciseScreen() {
             >
                 <Text>Console log session id</Text>
             </Pressable>
-            <Pressable
-                onPress={() => console.log("button session id = ", currentSessionId)}
-                className="p-3 bg-sky-200"
-            >
-                <Text>Console log current session id</Text>
-            </Pressable>
 
             <FlatList
                 data={workoutSession}
@@ -322,7 +317,7 @@ export default function ExerciseScreen() {
                 )}
             />
 
-            {workoutSession.some((session) => !session.completed) && (
+            {sessionId && (
                 <Text className="text-green-500 text-xl text-center mb-2">
                     Workout session active
                 </Text>
@@ -419,7 +414,7 @@ export default function ExerciseScreen() {
                                     <Pressable
                                         className="p-3 px-4 rounded-lg bg-gray-200"
                                         onPress={() => {
-                                            fetchWorkoutSession();
+                                            // fetchWorkoutSession();
                                             handleNewSetLogSession();
                                             setModalVisible(false);
                                         }}

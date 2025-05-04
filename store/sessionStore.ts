@@ -5,7 +5,7 @@ import { supabase } from "~/utils/supabase";
 interface SessionState {
     sessionId: string | null;
     startSession: (userId: string, routineId: string) => Promise<string>;
-    endSession: () => Promise<void>;
+    endSession: (userId: string) => Promise<void>;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -23,11 +23,15 @@ export const useSessionStore = create<SessionState>((set) => ({
         if (fetchError) {
             console.error("Error fetching workout sessions:", fetchError);
             return "";
+        }else {
+            console.log("incomplete sessions data = ",existingSessions)
         }
 
+
+        //if any active sessions exist use its id
         if (existingSessions.length > 0) {
             set({ sessionId: existingSessions[0].session_id });
-            console.log(
+            console.warn(
                 "using old session, session id =",
                 existingSessions[0].session_id,
             );
@@ -51,7 +55,7 @@ export const useSessionStore = create<SessionState>((set) => ({
 
         if (insertError) {
             console.error("Error creating workout session:", insertError);
-            return "";
+            return;
         }
 
         console.log(
@@ -62,16 +66,17 @@ export const useSessionStore = create<SessionState>((set) => ({
         return newSession.session_id;
     },
 
-    endSession: async () => {
+    endSession: async (userId: string) => {
+        console.warn("endsession pressed")
         const { data: finishSessionData, error: finishSessionErr } =
-        await supabase
-        .from("workout_sessions")
-        .update({ completed: true, end_time: new Date() })
-        .eq("user_id", user.id)
-        .eq("completed", false); // only update incomplete sessions
+            await supabase
+                .from("workout_sessions")
+                .update({ completed: true, end_time: new Date() })
+                .eq("user_id", userId)
+                .eq("completed", false); // only update incomplete sessions
         console.log("finishworkoutsession called");
-        console.log(finishSessionData);
-        console.log("workoutsession table: UPDATE", finishSessionData);
+        // console.log(finishSessionData);
+        console.warn("workoutsession table: UPDATE", finishSessionData);
 
         if (finishSessionErr) {
             console.warn("setLog error = ", finishSessionErr);
