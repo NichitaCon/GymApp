@@ -6,13 +6,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useState } from "react";
 
-export default function Header({ header, back }) {
+export default function Header({ header, back, rightButtons = [] }) {
     const insets = useSafeAreaInsets();
     const AdjustedInset = insets.top - 5;
     const [isBackEnabled, setIsBackEnabled] = useState(
         back === undefined ? true : back,
     );
-    // console.log("insets", AdjustedInset);
     return (
         <View
             style={{
@@ -39,6 +38,16 @@ export default function Header({ header, back }) {
             >
                 {header}
             </Text>
+
+            {rightButtons.map((btn, index) => (
+                <TouchableOpacity
+                    key={index}
+                    onPress={btn.onPress}
+                    className="ml-2"
+                >
+                    {btn.component}
+                </TouchableOpacity>
+            ))}
         </View>
     );
 }

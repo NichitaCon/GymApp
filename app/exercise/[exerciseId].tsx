@@ -20,6 +20,7 @@ import Tip from "~/components/Tip";
 import Header from "~/components/Header";
 import { useSessionStore } from "~/store/sessionStore";
 import { FinishButton } from "~/components/FinishSession";
+import { EditButton } from "~/components/EditButton";
 
 export default function ExerciseScreen() {
     const { exerciseId, routineId } = useLocalSearchParams(); // Get exercise ID
@@ -36,14 +37,17 @@ export default function ExerciseScreen() {
 
     const [weight, setWeight] = useState("");
     const [reps, setReps] = useState("");
+    const [restTime, setRestTime] = useState("");
 
     const { user } = useAuth();
 
-    const [modalVisible, setModalVisible] = useState(false);
+    const [setLogmodalVisible, setSetLogModalVisible] = useState(false);
+    const [exerciseModalVisible, setExerciseModalVisible] = useState(false);
 
     useEffect(() => {
         fetchRoutineExercises();
         fetchExercise();
+        fetchRestTime();
     }, [setLog]);
 
     useFocusEffect(
@@ -174,6 +178,50 @@ export default function ExerciseScreen() {
         await fetchWorkoutSession(); // Optional, depending on your app logic
     };
 
+    const updateRestTime = async () => {
+        const { data, error } = await supabase
+            .from("routine_exercises")
+            .update({ rest_duration: restTime })
+            .eq("routine_id", routineId)
+            .eq("exercise_id", exerciseId)
+            // .select("*");
+
+        if (error) {
+            console.error("Error in updateRestTime:", error);
+        } else if (data.length < 0) {
+            console.warn(
+                "updateRestTime insertion successful, but no rows inserted:",
+                data,
+            );
+        } else {
+            // console.log("updateRestTime Successful:", data);
+        }
+    };
+
+    const fetchRestTime = async () => {
+        const { data, error } = await supabase
+            .from("routine_exercises")
+            .select("rest_duration")
+            .eq("routine_id", routineId)
+            .eq("exercise_id", exerciseId)
+            .single();
+        if (error) {
+            console.error("Error in fetchRestTime:", error);
+        } else if (data.length < 0) {
+            console.warn("No data present in fetchRestTime:", data);
+        } else {
+            setRestTime(data.rest_duration);
+            console.log("routine exercise data = ", data, error);
+        }
+    };
+
+    const headerDebug = () => {
+        console.log("HEADER DEBUG called :)");
+        setExerciseModalVisible(true);
+        console.log("restTime =", restTime);
+        fetchRestTime();
+    };
+
     return (
         <View className="flex-1 bg-white p-5">
             <Stack.Screen
@@ -183,7 +231,16 @@ export default function ExerciseScreen() {
                     headerBackTitle: "Home",
                 }}
             />
-            <Header header={exercise ? exercise.name : "Exercise"} />
+            <Header
+                header={exercise ? exercise.name : "Exercise"}
+                rightButtons={[
+                    {
+                        component: <EditButton />,
+                        onPress: headerDebug,
+                    },
+                ]}
+            />
+
             {workoutSession.length === 0 && (
                 <View className="mb-3 gap-4">
                     <Tip
@@ -204,13 +261,6 @@ export default function ExerciseScreen() {
                     />
                 </View>
             )}
-
-            <Pressable
-                onPress={() => console.log("button session id = ", sessionId)}
-                className="p-3 bg-sky-200"
-            >
-                <Text>Console log session id</Text>
-            </Pressable>
 
             <FlatList
                 data={workoutSession}
@@ -256,7 +306,7 @@ export default function ExerciseScreen() {
 
                 <Pressable
                     onPress={() => {
-                        setModalVisible(true);
+                        setSetLogModalVisible(true);
                     }}
                 >
                     <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl mb-5">
@@ -270,13 +320,14 @@ export default function ExerciseScreen() {
                 </Pressable>
             </View>
 
+            {/* SetLog modal */}
             <Modal
                 animationType="slide"
                 transparent={true}
-                visible={modalVisible}
+                visible={setLogmodalVisible}
             >
                 <Pressable
-                    onPress={() => setModalVisible(false)}
+                    onPress={() => setSetLogModalVisible(false)}
                     className="flex-auto justify-end items-center bg-black/20 backdrop-blur-xl"
                 >
                     <KeyboardAvoidingView
@@ -288,7 +339,7 @@ export default function ExerciseScreen() {
                             keyboardShouldPersistTaps="handled"
                         >
                             <Pressable
-                                onPress={() => setModalVisible(true)}
+                                onPress={() => setSetLogModalVisible(true)}
                                 className="bg-white p-6 rounded-lg w-full"
                             >
                                 <View className="flex-row justify-between">
@@ -327,7 +378,9 @@ export default function ExerciseScreen() {
                                 <View className="flex-row justify-between">
                                     <Pressable
                                         className="p-3 px-4 rounded-lg bg-gray-200"
-                                        onPress={() => setModalVisible(false)}
+                                        onPress={() =>
+                                            setSetLogModalVisible(false)
+                                        }
                                     >
                                         <Text className="text-xl">Cancel</Text>
                                     </Pressable>
@@ -336,7 +389,72 @@ export default function ExerciseScreen() {
                                         onPress={() => {
                                             // fetchWorkoutSession();
                                             handleNewSetLogSession();
-                                            setModalVisible(false);
+                                            setSetLogModalVisible(false);
+                                        }}
+                                    >
+                                        <Text className="text-xl">Save</Text>
+                                    </Pressable>
+                                </View>
+                            </Pressable>
+                        </ScrollView>
+                    </KeyboardAvoidingView>
+                </Pressable>
+            </Modal>
+
+            {/* RestTime modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={exerciseModalVisible}
+            >
+                <Pressable
+                    onPress={() => setExerciseModalVisible(false)}
+                    className="flex-auto justify-end items-center bg-black/20 backdrop-blur-xl"
+                >
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === "ios" ? "padding" : "height"}
+                        className="w-full"
+                    >
+                        <ScrollView
+                            contentContainerStyle={{ flexGrow: 1 }}
+                            keyboardShouldPersistTaps="handled"
+                        >
+                            <Pressable
+                                onPress={() => setExerciseModalVisible(true)}
+                                className="bg-white p-6 rounded-lg w-full"
+                            >
+                                <View className="flex-row justify-between">
+                                    <View className="w-1/3 justify-end">
+                                        <Text className="text-2xl mb-1">
+                                            Rest Time
+                                        </Text>
+                                        <TextInput
+                                            value={restTime?.toString() || ""}
+                                            onChangeText={(text) =>
+                                                setRestTime(text)
+                                            }
+                                            placeholder="Rest Time"
+                                            keyboardType="number-pad"
+                                            placeholderTextColor="gray"
+                                            className="mb-4 p-3 rounded-lg bg-gray-200"
+                                        />
+                                    </View>
+                                </View>
+
+                                <View className="flex-row justify-between">
+                                    <Pressable
+                                        className="p-3 px-4 rounded-lg bg-gray-200"
+                                        onPress={() =>
+                                            setExerciseModalVisible(false)
+                                        }
+                                    >
+                                        <Text className="text-xl">Cancel</Text>
+                                    </Pressable>
+                                    <Pressable
+                                        className="p-3 px-4 rounded-lg bg-gray-200"
+                                        onPress={() => {
+                                            updateRestTime();
+                                            setExerciseModalVisible(false);
                                         }}
                                     >
                                         <Text className="text-xl">Save</Text>

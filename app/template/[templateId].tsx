@@ -20,6 +20,7 @@ import Exercises from "../exercise/exercises";
 import { useFocusEffect } from "@react-navigation/native";
 import React from "react";
 import Header from "~/components/Header";
+import { DeleteButton } from "~/components/DeleteButton";
 
 export default function RoutinePage() {
     const { templateId } = useLocalSearchParams();
@@ -181,10 +182,26 @@ export default function RoutinePage() {
                 }}
             />
             <View className="flex-row justify-between items-center">
-                <Header header={"Template"} />
-                {(template.creator_id === user.id ||
+                <Header
+                    header={"Template"}
+                    rightButtons={[
+                        ...(template.creator_id === user.id ||
+                        userRole.role === "Admin"
+                            ? [
+                                  {
+                                      component: <DeleteButton />,
+                                      onPress: handleDeleteAndReturn,
+                                  },
+                              ]
+                            : []),
+                    ]}
+                />
+                {/* {(template.creator_id === user.id ||
                     userRole.role === "Admin") && (
-                    <Pressable className="bg-red-300 p-4 rounded-full mt-3" onPress={() => setModalVisible(true)}>
+                    <Pressable
+                        className="bg-red-300 p-4 rounded-full mt-3"
+                        onPress={() => setModalVisible(true)}
+                    >
                         <Entypo
                             name="trash"
                             size={24}
@@ -192,7 +209,7 @@ export default function RoutinePage() {
                             className="justify-end"
                         />
                     </Pressable>
-                )}
+                )} */}
             </View>
             {template.description ? (
                 <View>

@@ -11,13 +11,13 @@ import {
 } from "react-native";
 
 import { supabase } from "~/utils/supabase";
+import { Entypo } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "~/contexts/AuthProvider";
 import ExerciseListItem from "~/components/ExerciseListItem";
 import Tip from "~/components/Tip";
 import Header from "~/components/Header";
 import { FinishButton } from "~/components/FinishSession";
-
 export default function RoutinePage() {
     const { id, updated } = useLocalSearchParams();
     const [exerciseId, setExerciseId] = useState(null);
@@ -195,7 +195,7 @@ export default function RoutinePage() {
                 )}
             />
 
-            <FinishButton/>
+            <FinishButton />
 
             <Link href={`/exercise/exercises?routineId=${id}`} asChild>
                 <Pressable>
