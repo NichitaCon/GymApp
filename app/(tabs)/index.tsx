@@ -5,7 +5,6 @@ import {
     Text,
     Pressable,
     Modal,
-    Button,
     TextInput,
     ScrollView,
     KeyboardAvoidingView,
@@ -21,32 +20,19 @@ import Entypo from "@expo/vector-icons/Entypo";
 import Tip from "~/components/Tip";
 import Header from "~/components/Header";
 import { FinishButton } from "~/components/FinishSession";
-import { useSessionStore } from "~/store/sessionStore";
 
 export default function Events() {
     const [routines, setRoutines] = useState([]);
     const { session, user } = useAuth();
-    // console.log("id = ",id);
-    // console.log("session user = ", session.user.id)
-    // console.log(useAuth())
 
     const [modalVisible, setModalVisible] = useState(false); // state to control modal visibility
 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const [workoutSession, setWorkoutSession] = useState([]);
-
-    const endSession = useSessionStore((state) => state.endSession);
-    const sessionId = useSessionStore((state) => state.sessionId);
-
-    // useEffect(() => {
-    //     // console.log("useEffect Triggered in: index.tsx");
-    // }, []);
 
     useFocusEffect(
         useCallback(() => {
             fetchRoutines();
-            fetchWorkoutSession();
             // console.log("usefocus effect called in index.tsx!")
         }, []),
     );
@@ -80,42 +66,9 @@ export default function Events() {
         fetchRoutines();
     };
 
-    const fetchWorkoutSession = async () => {
-        const { data, error } = await supabase
-            .from("workout_sessions")
-            .select("*, set_logs(*)")
-            .eq("user_id", user.id);
-        // console.log(data);
-        setWorkoutSession(data);
-
-        if (error) {
-            console.warn("setLog error = ", error);
-        } else {
-            // console.log("workoutsession table: ", data);
-        }
-    };
-
-    const finishWorkoutSession = async () => {
-        console.log("finishworkoutsession called");
-        const { data, error } = await supabase
-            .from("workout_sessions")
-            .update({ completed: true, end_time: new Date() })
-            .eq("user_id", user.id)
-            .eq("completed", false); // only update incomplete sessions
-        fetchWorkoutSession();
-        // console.log(data);
-
-        if (error) {
-            console.warn("setLog error = ", error);
-        } else {
-            console.log("workoutsession table: UPDATE", data);
-        }
-    };
-
     return (
         <View className="flex-1 bg-white p-5">
             <Stack.Screen options={{ title: "Home" }} />
-
             <Header header={"Home"} back={false} />
             <View className="flex-row justify-between items-center mb-4">
                 <Text className="text-4xl">Workouts</Text>
@@ -128,7 +81,7 @@ export default function Events() {
                     />
                 </Pressable>
             </View>
-
+            {/* tips */}
             {routines.length === 0 && (
                 <Tip
                     title={"Welcome to the Home Page!"}
@@ -140,14 +93,6 @@ export default function Events() {
                     }
                 />
             )}
-
-            <Pressable
-                onPress={() => console.log("button session id = ", sessionId)}
-                className="p-3 bg-sky-200"
-            >
-                <Text>Console log session id</Text>
-            </Pressable>
-
             <FlatList
                 className="bg-white"
                 data={routines}
@@ -158,27 +103,7 @@ export default function Events() {
                     />
                 )}
             />
-
-            {sessionId && (
-                <View>
-                    <View className="flex-row justify-between items-center p-3 pb-0">
-                        <Text className="text-green-500 text-2xl">
-                            Workout session active
-                        </Text>
-                        <Pressable
-                            onPress={() => {
-                                endSession(user.id);
-                            }}
-                        >
-                            <Text className="bg-blue-400 p-2 px-4 rounded-full text-center font-semibold text-xl">
-                                Finish
-                            </Text>
-                        </Pressable>
-                    </View>
-                    <FinishButton />
-                </View>
-            )}
-
+            <FinishButton />
             <Modal
                 animationType="slide"
                 transparent={true} // Modal background is transparent

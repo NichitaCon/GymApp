@@ -53,15 +53,6 @@ export default function ExerciseScreen() {
         }, []),
     );
 
-    // console.log("routineId = ", routineId);
-    // console.log("Workout session = ", JSON.stringify(workoutSession, null, 2));
-    // console.log("setlog = ", JSON.stringify(setLog, null, 2));
-    // console.log("routineExercises = ", JSON.stringify(routineExercises, null, 1));
-    // console.log(
-    //     "workout session setlogs reps",
-    //     workoutSession[0].set_logs[0].reps,
-    // );
-
     const fetchSetLog = async () => {
         setLoading(true);
 
@@ -134,57 +125,6 @@ export default function ExerciseScreen() {
         setLoading(false);
     };
 
-    const getOrCreateWorkoutSession = async () => {
-        console.log("Checking for existing incomplete workout session...");
-
-        // Step 1: Check if an incomplete workout session exists
-        const { data: existingSessions, error: fetchError } = await supabase
-            .from("workout_sessions")
-            .select("session_id")
-            .eq("user_id", user.id)
-            .eq("completed", false)
-            .limit(1); // Only need the first incomplete session
-
-        if (fetchError) {
-            console.error("Error fetching workout sessions:", fetchError);
-            return null;
-        }
-
-        if (existingSessions.length > 0) {
-            console.log(
-                "Returning existing session:",
-                existingSessions[0].session_id,
-            );
-            setNewSessionId(existingSessions[0].session_id); // Store in state
-            return existingSessions[0].session_id;
-        }
-
-        // Step 2: If no incomplete session exists, create a new one
-        console.log("No existing session found, creating new session...");
-        const { data: newSession, error: insertError } = await supabase
-            .from("workout_sessions")
-            .insert([
-                {
-                    user_id: user.id,
-                    routine_id: routineId,
-                    end_time: null,
-                    notes: null,
-                    completed: false,
-                },
-            ])
-            .select("session_id")
-            .single(); // Ensures we get a single object instead of an array
-
-        if (insertError) {
-            console.error("Error creating workout session:", insertError);
-            return null;
-        }
-
-        console.log("Created new workout session:", newSession.session_id);
-        setNewSessionId(newSession.session_id); // Store in state
-        return newSession.session_id;
-    };
-
     const createSetLog = async (sessionId) => {
         if (!sessionId) {
             console.log("No session ID available, cannot create set log.");
@@ -216,13 +156,15 @@ export default function ExerciseScreen() {
         fetchSetLog();
     };
 
-    // Example function to call both operations sequentially
     const handleNewSetLogSession = async () => {
         let currentSessionId = sessionId;
 
         // If no session exists, create one using Zustand's startSession
         if (currentSessionId == null) {
-            console.warn("NO session exists, creating new one IN HandleNewSetLogSession, session id =",sessionId)
+            console.warn(
+                "NO session exists, creating new one IN HandleNewSetLogSession, session id =",
+                sessionId,
+            );
             currentSessionId = await startSession(user.id, routineId); // This also updates Zustand state
         }
 
@@ -232,13 +174,6 @@ export default function ExerciseScreen() {
         await fetchWorkoutSession(); // Optional, depending on your app logic
     };
 
-    // console.log("newSessionId outside: ", newSessionId);
-
-    // if (loading) {
-    //     return <ActivityIndicator />;
-    // }
-
-    // console.log("setlog = ", JSON.stringify(setLog, null, 2));
     return (
         <View className="flex-1 bg-white p-5">
             <Stack.Screen
@@ -270,7 +205,6 @@ export default function ExerciseScreen() {
                 </View>
             )}
 
-            <FinishButton />
             <Pressable
                 onPress={() => console.log("button session id = ", sessionId)}
                 className="p-3 bg-sky-200"
@@ -317,38 +251,24 @@ export default function ExerciseScreen() {
                 )}
             />
 
-            {sessionId && (
-                <Text className="text-green-500 text-xl text-center mb-2">
-                    Workout session active
-                </Text>
-            )}
+            <View className="gap-3">
+                <FinishButton />
 
-            {/* <Pressable
-                className="p-3 px-4 rounded-lg bg-gray-200"
-                onPress={() => {
-                    createWorkoutSession();
-                }}
-            >
-                <Text className="text-xl">CreateWkSession</Text>
-            </Pressable> */}
-
-            {/* <Link href={`/exercise/exercises?routineId=`} asChild> */}
-            <Pressable
-                onPress={() => {
-                    setModalVisible(true);
-                }}
-            >
-                <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl mb-5">
-                    <Entypo
-                        name="plus"
-                        size={24}
-                        color="black"
-                        className="justify-end"
-                    />
-                </Text>
-            </Pressable>
-            {/* <Exercises updateExerciseList={updateExerciseList} />
-            </Link> */}
+                <Pressable
+                    onPress={() => {
+                        setModalVisible(true);
+                    }}
+                >
+                    <Text className="bg-blue-400 p-3 rounded-full text-center font-semibold text-xl mb-5">
+                        <Entypo
+                            name="plus"
+                            size={24}
+                            color="black"
+                            className="justify-end"
+                        />
+                    </Text>
+                </Pressable>
+            </View>
 
             <Modal
                 animationType="slide"

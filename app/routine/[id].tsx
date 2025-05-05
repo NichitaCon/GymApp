@@ -13,13 +13,10 @@ import {
 import { supabase } from "~/utils/supabase";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "~/contexts/AuthProvider";
-import RoutineListItem from "~/components/RoutineListItem";
 import ExerciseListItem from "~/components/ExerciseListItem";
-import Entypo from "@expo/vector-icons/Entypo";
-import Exercises from "../exercise/exercises";
-import React from "react";
 import Tip from "~/components/Tip";
 import Header from "~/components/Header";
+import { FinishButton } from "~/components/FinishSession";
 
 export default function RoutinePage() {
     const { id, updated } = useLocalSearchParams();
@@ -158,22 +155,6 @@ export default function RoutinePage() {
         }
     };
 
-    // useEffect(() => {
-    //     console.log("all exercises in routine id ", id, ": ", exercise);
-    // }, [exercise]);
-
-    // useFocusEffect(
-    //     React.useCallback(() => {
-    //         console.log("Screen is focused")
-    //         // console.log("exercise before call = ", JSON.stringify(exercise, null, 2))
-    //         fetchExercise();
-    //         // console.log("exercise after call = ", JSON.stringify(exercise, null, 2))
-    //         console.log("fetchRoutine Called")
-    //     }, []),
-    // );
-
-    // console.log("fetchexercise from routinerxercise = ",exercise)
-
     if (loading) {
         return <ActivityIndicator />;
     }
@@ -213,6 +194,8 @@ export default function RoutinePage() {
                     <ExerciseListItem exercise={item} routineId={id} />
                 )}
             />
+
+            <FinishButton/>
 
             <Link href={`/exercise/exercises?routineId=${id}`} asChild>
                 <Pressable>
