@@ -19,6 +19,8 @@ import dayjs from "dayjs";
 import Tip from "~/components/Tip";
 import Header from "~/components/Header";
 import { useSessionStore } from "~/store/sessionStore";
+import { useRestStore } from "~/store/restStore";
+
 import { FinishButton } from "~/components/FinishSession";
 import { EditButton } from "~/components/EditButton";
 
@@ -34,6 +36,11 @@ export default function ExerciseScreen() {
 
     const startSession = useSessionStore((state) => state.startSession);
     const sessionId = useSessionStore((state) => state.sessionId);
+
+    const isResting = useRestStore((state) => state.isResting);
+    const setIsResting = useRestStore((state) => state.restTime);
+    const startRest = useRestStore((state) => state.startRest);
+    const endRest = useRestStore((state) => state.endRest);
 
     const [weight, setWeight] = useState("");
     const [reps, setReps] = useState("");
@@ -157,6 +164,7 @@ export default function ExerciseScreen() {
 
         // console.log("create set log data: ", data);
         console.log(error);
+        startRest(Number(restTime));
         fetchSetLog();
     };
 
@@ -183,8 +191,8 @@ export default function ExerciseScreen() {
             .from("routine_exercises")
             .update({ rest_duration: restTime })
             .eq("routine_id", routineId)
-            .eq("exercise_id", exerciseId)
-            // .select("*");
+            .eq("exercise_id", exerciseId);
+        // .select("*");
 
         if (error) {
             console.error("Error in updateRestTime:", error);
@@ -215,12 +223,12 @@ export default function ExerciseScreen() {
         }
     };
 
-    const headerDebug = () => {
-        console.log("HEADER DEBUG called :)");
-        setExerciseModalVisible(true);
-        console.log("restTime =", restTime);
-        fetchRestTime();
-    };
+    // const headerDebug = () => {
+    //     console.log("HEADER DEBUG called :)");
+    //     setExerciseModalVisible(true);
+    //     console.log("restTime =", restTime);
+    //     fetchRestTime();
+    // };
 
     return (
         <View className="flex-1 bg-white p-5">
@@ -236,10 +244,30 @@ export default function ExerciseScreen() {
                 rightButtons={[
                     {
                         component: <EditButton />,
-                        onPress: headerDebug,
+                        onPress: () => setExerciseModalVisible(true),
                     },
                 ]}
             />
+
+            <Pressable className="p-5" onPress={() => console.log(isResting)}>
+                <Text className="text-2xl mb-1 bg-blue-300">Rest Time boolean</Text>
+                <Text className="text-2xl mb-1">{isResting}</Text>
+            </Pressable>
+
+            <Pressable className="p-5" onPress={() => console.log(setIsResting)}>
+                <Text className="text-2xl mb-1 bg-blue-300">Rest Time time...</Text>
+                <Text className="text-2xl mb-1">{isResting}</Text>
+            </Pressable>
+
+            <Pressable className="p-5" onPress={() => startRest(Number(restTime))}>
+                <Text className="text-2xl mb-1 bg-blue-300">startRest</Text>
+                <Text className="text-2xl mb-1">{isResting}</Text>
+            </Pressable>
+
+            <Pressable className="p-5" onPress={() => endRest()}>
+                <Text className="text-2xl mb-1 bg-blue-300">Stop rest</Text>
+                <Text className="text-2xl mb-1">{isResting}</Text>
+            </Pressable>
 
             {workoutSession.length === 0 && (
                 <View className="mb-3 gap-4">

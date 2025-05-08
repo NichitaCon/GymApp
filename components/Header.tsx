@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useState } from "react";
+import RestTimer from "./RestTimer";
 
 export default function Header({ header, back, rightButtons = [] }) {
     const insets = useSafeAreaInsets();
@@ -38,6 +39,8 @@ export default function Header({ header, back, rightButtons = [] }) {
             >
                 {header}
             </Text>
+
+            <RestTimer></RestTimer>
 
             {rightButtons.map((btn, index) => (
                 <TouchableOpacity
