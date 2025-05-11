@@ -249,24 +249,20 @@ export default function ExerciseScreen() {
                 ]}
             />
 
-            <Pressable className="p-5" onPress={() => console.log(isResting)}>
-                <Text className="text-2xl mb-1 bg-blue-300">Rest Time boolean</Text>
-                <Text className="text-2xl mb-1">{isResting}</Text>
+            <Pressable className="p-2 mb-5 bg-blue-300" onPress={() => console.log(isResting)}>
+                <Text className="text-2xl mb-1 ">Rest Time boolean</Text>
             </Pressable>
 
-            <Pressable className="p-5" onPress={() => console.log(setIsResting)}>
-                <Text className="text-2xl mb-1 bg-blue-300">Rest Time time...</Text>
-                <Text className="text-2xl mb-1">{isResting}</Text>
+            <Pressable className="p-2 mb-5 bg-blue-300" onPress={() => console.log(setIsResting)}>
+                <Text className="text-2xl mb-1 ">Rest Time time...</Text>
             </Pressable>
 
-            <Pressable className="p-5" onPress={() => startRest(Number(restTime))}>
-                <Text className="text-2xl mb-1 bg-blue-300">startRest</Text>
-                <Text className="text-2xl mb-1">{isResting}</Text>
+            <Pressable className="p-2 mb-5 bg-blue-300" onPress={() => startRest(Number(restTime))}>
+                <Text className="text-2xl mb-1 ">startRest</Text>
             </Pressable>
 
-            <Pressable className="p-5" onPress={() => endRest()}>
-                <Text className="text-2xl mb-1 bg-blue-300">Stop rest</Text>
-                <Text className="text-2xl mb-1">{isResting}</Text>
+            <Pressable className="p-2 mb-5 bg-blue-300" onPress={() => endRest()}>
+                <Text className="text-2xl mb-1 ">Stop rest</Text>
             </Pressable>
 
             {workoutSession.length === 0 && (

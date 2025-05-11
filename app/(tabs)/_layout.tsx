@@ -4,7 +4,7 @@ import { HeaderButton } from "../../components/HeaderButton";
 import { TabBarIcon } from "../../components/TabBarIcon";
 
 import { useAuth } from "~/contexts/AuthProvider";
-import { StatusBar } from "react-native";
+import { StatusBar, Text } from "react-native";
 
 export default function TabLayout() {
     const { isAuthenticated } = useAuth();
@@ -21,6 +21,7 @@ export default function TabLayout() {
             }}
         >
             <StatusBar style="dark" />
+            {/* <Text className="p-10">test</Text> */}
 
             <Tabs.Screen
                 name="index"
