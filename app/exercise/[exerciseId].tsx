@@ -164,6 +164,7 @@ export default function ExerciseScreen() {
 
         // console.log("create set log data: ", data);
         console.log(error);
+
         startRest(Number(restTime));
         fetchSetLog();
     };

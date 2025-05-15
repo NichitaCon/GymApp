@@ -11,6 +11,12 @@ import {
     Platform,
 } from "react-native";
 
+import {
+    registerForPushNotificationsAsync,
+    configureNotificationChannel,
+    scheduleLocalNotification,
+} from "~/utils/notifications";
+
 import RoutineListItem from "~/components/RoutineListItem";
 import { supabase } from "~/utils/supabase";
 import { useCallback, useEffect, useState } from "react";
@@ -20,6 +26,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import Tip from "~/components/Tip";
 import Header from "~/components/Header";
 import { FinishButton } from "~/components/FinishSession";
+import { Button } from "~/components/Button";
 
 export default function Events() {
     const [routines, setRoutines] = useState([]);
@@ -36,6 +43,11 @@ export default function Events() {
             // console.log("usefocus effect called in index.tsx!")
         }, []),
     );
+
+    useEffect(() => {
+        registerForPushNotificationsAsync();
+        configureNotificationChannel();
+    }, []);
 
     const fetchRoutines = async () => {
         const { data, error } = await supabase

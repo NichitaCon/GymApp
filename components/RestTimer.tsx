@@ -1,6 +1,7 @@
 import { View, Text, Pressable, Alert } from "react-native";
 import { Link } from "expo-router";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
+import { scheduleLocalNotification } from "~/utils/notifications";
 
 import { useRestStore } from "~/store/restStore";
 
@@ -28,6 +29,7 @@ export default function RestTimer({}) {
         );
     };
     if (isResting) {
+        // scheduleLocalNotification({title: "Rest Up!", body: "Your rest time is up!", triggerTime: Number(restTime)});
         return (
             <Pressable onPress={confirmSkip}>
                 <CountdownCircleTimer
