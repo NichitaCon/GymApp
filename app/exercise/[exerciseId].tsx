@@ -123,7 +123,8 @@ export default function ExerciseScreen() {
             .select("*, set_logs!inner(*)")
             .eq("user_id", user.id)
             .eq("set_logs.exercise_id", exerciseId)
-            .order("start_time", { ascending: false });
+            .order("session_id", { ascending: false })
+            .order("set_log_id", { ascending: true, referencedTable: "set_logs" });
         setWorkoutSession(data);
         // console.log(data);
 
@@ -265,6 +266,7 @@ export default function ExerciseScreen() {
             <Pressable className="p-2 mb-5 bg-blue-300" onPress={() => endRest()}>
                 <Text className="text-2xl mb-1 ">Stop rest</Text>
             </Pressable>
+
 
             {workoutSession.length === 0 && (
                 <View className="mb-3 gap-4">
