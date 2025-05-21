@@ -26,7 +26,7 @@ export default function RoutinePage() {
     const { templateId } = useLocalSearchParams();
     const [template, setTemplate] = useState([]);
     const [templateExercise, setTemplateExercise] = useState([]);
-    const [modalVisible, setModalVisible] = useState(false);
+    const [DeleteModalVisible, setDeleteModalVisible] = useState(false);
     const [userRole, setUserRole] = useState("User");
 
     console.log("template = ", templateId);
@@ -179,38 +179,23 @@ export default function RoutinePage() {
                     title: template ? template?.name : "Template",
                     headerTintColor: "black",
                     headerBackTitle: "Home",
+                    header: () => (
+                        <Header
+                            header="Template"
+                            back={true}
+                            rightButtons={[
+                                {
+                                    component: <DeleteButton />,
+                                    onPress: () =>
+                                        setDeleteModalVisible(true),
+                                },
+                            ]}
+                        />
+                        // Add extra buttons/components here if you want
+                    ),
                 }}
             />
-            <View className="flex-row justify-between items-center">
-                <Header
-                    header={"Template"}
-                    rightButtons={[
-                        ...(template.creator_id === user.id ||
-                        userRole.role === "Admin"
-                            ? [
-                                  {
-                                      component: <DeleteButton />,
-                                      onPress: handleDeleteAndReturn,
-                                  },
-                              ]
-                            : []),
-                    ]}
-                />
-                {/* {(template.creator_id === user.id ||
-                    userRole.role === "Admin") && (
-                    <Pressable
-                        className="bg-red-300 p-4 rounded-full mt-3"
-                        onPress={() => setModalVisible(true)}
-                    >
-                        <Entypo
-                            name="trash"
-                            size={24}
-                            color="black"
-                            className="justify-end"
-                        />
-                    </Pressable>
-                )} */}
-            </View>
+
             {template.description ? (
                 <View>
                     {/* <Text className="text-2xl">Description:</Text> */}
@@ -261,17 +246,17 @@ export default function RoutinePage() {
             <Modal
                 animationType="slide"
                 transparent={true} // Modal background is transparent
-                visible={modalVisible}
+                visible={DeleteModalVisible}
             >
                 <Pressable
                     onPress={() => {
-                        setModalVisible(false);
+                        setDeleteModalVisible(false);
                     }}
                     className="flex-auto justify-end items-center bg-black/20 backdrop-blur-xl"
                 >
                     <Pressable
                         onPress={() => {
-                            setModalVisible(true);
+                            setDeleteModalVisible(true);
                         }}
                         className="bg-white p-6 rounded-lg w-full pb-safe-offset-1"
                     >
@@ -287,7 +272,7 @@ export default function RoutinePage() {
                             <Pressable
                                 className="p-3 px-4 rounded-lg bg-gray-200"
                                 onPress={() => {
-                                    setModalVisible(false);
+                                    setDeleteModalVisible(false);
                                 }}
                             >
                                 <Text className="text-xl">Cancel</Text>
@@ -296,7 +281,7 @@ export default function RoutinePage() {
                                 className="p-3 px-4 rounded-lg bg-red-200"
                                 onPress={() => {
                                     handleDeleteAndReturn();
-                                    setModalVisible(false);
+                                    setDeleteModalVisible(false);
                                 }}
                             >
                                 <Text className="text-xl">Confirm</Text>

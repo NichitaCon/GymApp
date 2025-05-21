@@ -124,7 +124,10 @@ export default function ExerciseScreen() {
             .eq("user_id", user.id)
             .eq("set_logs.exercise_id", exerciseId)
             .order("session_id", { ascending: false })
-            .order("set_log_id", { ascending: true, referencedTable: "set_logs" });
+            .order("set_log_id", {
+                ascending: true,
+                referencedTable: "set_logs",
+            });
         setWorkoutSession(data);
         // console.log(data);
 
@@ -225,13 +228,6 @@ export default function ExerciseScreen() {
         }
     };
 
-    // const headerDebug = () => {
-    //     console.log("HEADER DEBUG called :)");
-    //     setExerciseModalVisible(true);
-    //     console.log("restTime =", restTime);
-    //     fetchRestTime();
-    // };
-
     return (
         <View className="flex-1 bg-white p-5">
             <Stack.Screen
@@ -239,34 +235,21 @@ export default function ExerciseScreen() {
                     title: exercise ? exercise.name : "Exercise",
                     headerTintColor: "black",
                     headerBackTitle: "Home",
+                    header: () => (
+                        <Header
+                            header={exercise ? exercise.name : "Exercise"}
+                            back={true}
+                            rightButtons={[
+                                {
+                                    component: <EditButton />,
+                                    onPress: () =>
+                                        setExerciseModalVisible(true),
+                                },
+                            ]}
+                        />
+                    ),
                 }}
             />
-            <Header
-                header={exercise ? exercise.name : "Exercise"}
-                rightButtons={[
-                    {
-                        component: <EditButton />,
-                        onPress: () => setExerciseModalVisible(true),
-                    },
-                ]}
-            />
-
-            <Pressable className="p-2 mb-5 bg-blue-300" onPress={() => console.log(isResting)}>
-                <Text className="text-2xl mb-1 ">Rest Time boolean</Text>
-            </Pressable>
-
-            <Pressable className="p-2 mb-5 bg-blue-300" onPress={() => console.log(setIsResting)}>
-                <Text className="text-2xl mb-1 ">Rest Time time...</Text>
-            </Pressable>
-
-            <Pressable className="p-2 mb-5 bg-blue-300" onPress={() => startRest(Number(restTime))}>
-                <Text className="text-2xl mb-1 ">startRest</Text>
-            </Pressable>
-
-            <Pressable className="p-2 mb-5 bg-blue-300" onPress={() => endRest()}>
-                <Text className="text-2xl mb-1 ">Stop rest</Text>
-            </Pressable>
-
 
             {workoutSession.length === 0 && (
                 <View className="mb-3 gap-4">
@@ -293,11 +276,8 @@ export default function ExerciseScreen() {
                 data={workoutSession}
                 renderItem={({ item }) => (
                     <View className="">
-                        <Text className="text-sm text-gray-500">
-                            session id: {item.session_id}
-                        </Text>
-                        <Text className="text-2xl mb-1 font-semibold">
-                            {dayjs(item.start_time).format("dddd D")}
+                        <Text className="text-2xl mb-1 mt-4 font-medium">
+                            {dayjs(item.start_time).format("D MMM")}
                         </Text>
 
                         {/* Displaying a fallback message if no set logs */}

@@ -133,7 +133,7 @@ export default function ExerciseScreen() {
                     headerBackTitle: "Home",
                 }}
             />
-            <Header header={"Edit Log"}/>
+            {/* <Header header={"Edit Log"}/> */}
             {/* Safeguard against missing exercise data */}
             <Text className="text-4xl mb-4">{exercise_name}</Text>
             <View className="mb-2">

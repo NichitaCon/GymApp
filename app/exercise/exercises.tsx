@@ -202,7 +202,7 @@ export default function Exercises() {
     return (
         <View className="flex-1 p-5 bg-white pb-safe-offset-0">
             <Stack.Screen options={{ title: "Exercises" }} />
-            <Header header={"Exercises"}/>
+            {/* <Header header={"Exercises"}/> */}
 
             {/* <Text className="text-4xl mb-5 text-center">Exercises</Text> */}
 

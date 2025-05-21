@@ -9,7 +9,7 @@ import RestTimer from "./RestTimer";
 
 export default function Header({ header, back, rightButtons = [] }) {
     const insets = useSafeAreaInsets();
-    const AdjustedInset = insets.top - 5;
+    const AdjustedInset = insets.top;
     const [isBackEnabled, setIsBackEnabled] = useState(
         back === undefined ? true : back,
     );
@@ -20,7 +20,7 @@ export default function Header({ header, back, rightButtons = [] }) {
                 alignItems: "center",
                 paddingTop: AdjustedInset,
             }}
-            className="pb-5 bg-white"
+            className="p-5 pb-0 bg-white"
         >
             {isBackEnabled == true && (
                 <Pressable onPress={() => router.back()}>

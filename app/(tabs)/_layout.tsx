@@ -1,5 +1,5 @@
 import { Link, Redirect, Tabs } from "expo-router";
-
+import Header from "~/components/Header";
 import { HeaderButton } from "../../components/HeaderButton";
 import { TabBarIcon } from "../../components/TabBarIcon";
 
@@ -16,25 +16,24 @@ export default function TabLayout() {
     return (
         <Tabs
             screenOptions={{
-                tabBarActiveTintColor: "black",
-                headerShown: false, // Hides the header for all screens
+                header: ({ options }) => <Header header={options.title} back={false} />,
             }}
         >
-            <StatusBar style="dark" />
+            {/* <StatusBar style="dark" /> */}
             {/* <Text className="p-10">test</Text> */}
 
             <Tabs.Screen
                 name="index"
                 options={{
-                    title: "Tab One",
+                    title: "Home",
                     tabBarIcon: ({ color }) => (
                         <TabBarIcon name="home" color={color} />
                     ),
-                    headerRight: () => (
-                        <Link href="/modal" asChild>
-                            <HeaderButton />
-                        </Link>
-                    ),
+                    header: () => (
+                        <Header header="Home" back={false} />
+                        // Add extra buttons/components here if you want
+                      ),
+
                 }}
             />
             <Tabs.Screen

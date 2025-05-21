@@ -22,8 +22,9 @@ export default function RootLayout() {
             {/* <Text className="p-10 bg-white">HELOOOOOOOOOOOOOOOO</Text> */}
             <Stack
                 screenOptions={{
-                    tabBarActiveTintColor: "black",
-                    headerShown: false, // Hides the header for all screens
+                    header: ({ options }) => (
+                        <Header header={options.title} back={true} />
+                    ),
                 }}
             >
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

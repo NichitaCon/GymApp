@@ -84,8 +84,20 @@ export default function Profile() {
     }
     return (
         <View className="flex-1 bg-white p-5 gap-3">
-            <Stack.Screen options={{ title: "Profile settings" }} />
-            <Header header={"Settings"} />
+            <Stack.Screen
+                options={{
+                    title: "Settings",
+                    headerTintColor: "black",
+                    headerBackTitle: "Home",
+                    header: () => (
+                        <Header
+                            header="Settings"
+                            back={true}
+                        />
+                        // Add extra buttons/components here if you want
+                    ),
+                }}
+            />
 
             <Text className="text-3xl">Edit Account:</Text>
 

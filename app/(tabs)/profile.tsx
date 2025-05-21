@@ -103,7 +103,7 @@ export default function Profile() {
     return (
         <View className="flex-1 bg-white p-5 gap-3">
             <Stack.Screen options={{ title: "Profile" }} />
-            <Header header={"Profile"} back={false} />
+            {/* <Header header={"Profile"} back={false} /> */}
             <View className="flex-row justify-between mb-8">
                 <View>
                     <Text className="text-4xl">{fullName}</Text>

@@ -172,7 +172,7 @@ export default function RoutinePage() {
                     headerBackTitle: "Home",
                 }}
             />
-            <Header header={routine ? routine.name : "Routine"} />
+            {/* <Header header={routine ? routine.name : "Routine"} /> */}
 
             {exercise?.length === 0 && (
                 <View className="">
@@ -188,10 +188,20 @@ export default function RoutinePage() {
                 </View>
             )}
             <FlatList
-                className="bg-white rounded-xl"
+                className="bg-white"
                 data={exercise}
-                renderItem={({ item }) => (
-                    <ExerciseListItem exercise={item} routineId={id} />
+                renderItem={({ item, index }) => (
+                    <View
+                        style={{
+                            borderTopLeftRadius: index === 0 ? 10 : 0,
+                            borderTopRightRadius: index === 0 ? 10 : 0,
+                            borderBottomLeftRadius: index === exercise.length - 1 ? 10 : 0,
+                            borderBottomRightRadius: index === exercise.length - 1 ? 10 : 0,
+                            overflow: "hidden",
+                        }}
+                    >
+                        <ExerciseListItem exercise={item} routineId={id} />
+                    </View>
                 )}
             />
 
