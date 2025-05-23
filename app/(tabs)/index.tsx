@@ -28,6 +28,8 @@ import Header from "~/components/Header";
 import { FinishButton } from "~/components/FinishSession";
 import { Button } from "~/components/Button";
 
+import { useSessionStore } from "~/store/sessionStore";
+
 export default function Events() {
     const [routines, setRoutines] = useState([]);
     const { session, user } = useAuth();
@@ -37,6 +39,9 @@ export default function Events() {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
 
+    const checkSession = useSessionStore((state) => state.checkSession);
+    const sessionId = useSessionStore((state) => state.sessionId);
+
     useFocusEffect(
         useCallback(() => {
             fetchRoutines();
@@ -45,6 +50,13 @@ export default function Events() {
     );
 
     useEffect(() => {
+        const fetchSession = async () => {
+            await checkSession(user.id);
+            // Can't reliably log sessionId here either, because set is async
+        };
+        fetchSession();
+        console.log("check session called in index.tsx!");
+        console.log("session id = ", sessionId);
         registerForPushNotificationsAsync();
         configureNotificationChannel();
     }, []);
@@ -55,6 +67,8 @@ export default function Events() {
             .select("*")
             .eq("user_id", session.user.id);
         setRoutines(data);
+
+        console.log("session id in fetchRoutines: ", sessionId);
     };
 
     const createRoutine = async () => {

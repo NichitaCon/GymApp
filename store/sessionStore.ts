@@ -4,12 +4,45 @@ import { supabase } from "~/utils/supabase";
 
 interface SessionState {
     sessionId: string | null;
+    checkSession: (userId: string) => Promise<string | null>;
     startSession: (userId: string, routineId: string) => Promise<string>;
     endSession: (userId: string) => Promise<void>;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
     sessionId: null,
+
+    checkSession: async (userId: string) => {
+        const { data: sessionData, error: fetchError } = await supabase
+            .from("workout_sessions")
+            .select("*")
+            .eq("user_id", userId)
+            .eq("completed", false)
+            .order("start_time", { ascending: false })
+            .limit(1);
+
+        if (fetchError) {
+            console.error("Error fetching workout sessions:", fetchError);
+            return null;
+        }
+
+        if (!sessionData || sessionData.length === 0) {
+            console.log("No unfinished session found.");
+            set({ sessionId: null });
+            return null;
+        }
+
+        const session = sessionData[0];
+
+        console.log("session data in the checksession store function = ", session);
+
+        set({
+            sessionId: session.session_id,
+        });
+
+        console.log("session id in the checksession store function = ", session.session_id);
+        return session.session_id;
+    },
 
     startSession: async (userId: string, routineId: string) => {
         // check for existing incomplete session
@@ -23,10 +56,9 @@ export const useSessionStore = create<SessionState>((set) => ({
         if (fetchError) {
             console.error("Error fetching workout sessions:", fetchError);
             return "";
-        }else {
-            console.log("incomplete sessions data = ",existingSessions)
+        } else {
+            console.log("incomplete sessions data = ", existingSessions);
         }
-
 
         //if any active sessions exist use its id
         if (existingSessions.length > 0) {
@@ -67,7 +99,7 @@ export const useSessionStore = create<SessionState>((set) => ({
     },
 
     endSession: async (userId: string) => {
-        console.warn("endsession pressed")
+        console.warn("endsession pressed");
         const { data: finishSessionData, error: finishSessionErr } =
             await supabase
                 .from("workout_sessions")

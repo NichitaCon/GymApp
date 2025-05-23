@@ -228,6 +228,58 @@ export default function ExerciseScreen() {
         }
     };
 
+    const getSessionTotals = (session) => {
+        if (!session) return { totalWeight: 0, totalReps: 0 }
+        let totalWeight = 0;
+        let totalReps = 0;
+
+        session.set_logs.forEach((setLog) => {
+            totalWeight += setLog.weight
+            totalReps += setLog.reps
+        })
+
+        return { totalWeight, totalReps };
+    }
+    
+    // Define progress with default values
+    let progress = {
+        totalWeight: 0,
+        totalReps: 0,
+        kgPerRep: 0,
+        Volume: 0,
+        repDiff: 0,
+        kgPerRepDiff: 0,
+        VolumeDiff: 0,
+    };
+
+    if (workoutSession.length >= 2) {
+        let currentSession = getSessionTotals(workoutSession[0]);
+        let previousSession = getSessionTotals(workoutSession[1]);
+
+        let kgPerRepDiffCurrent =
+            currentSession.totalReps > 0 && previousSession.totalReps > 0
+        
+        progress = {
+            totalWeight: currentSession.totalWeight,
+            totalReps: currentSession.totalReps,
+            kgPerRep: currentSession.totalReps > 0 ? currentSession.totalWeight / currentSession.totalReps : 0,
+            Volume: currentSession.totalWeight,
+            repDiff: currentSession.totalReps - previousSession.totalReps,
+            kgPerRepDiff: 
+            currentSession.totalReps > 0 && previousSession.totalReps > 0
+            ? currentSession.totalWeight / currentSession.totalReps -
+              previousSession.totalWeight / previousSession.totalReps
+            : 0,
+            VolumeDiff: currentSession.totalWeight - previousSession.totalWeight,
+        };
+        console.log("Progress: ", progress);
+    }
+        
+    console.log("first session kg total:", getSessionTotals(workoutSession[0]).totalWeight)
+
+    console.log("workoutSession:", JSON.stringify(workoutSession, null, 2));
+    // console.log("workoutSession[0]:", JSON.stringify(workoutSession[0], null, 2));
+
     return (
         <View className="flex-1 bg-white p-5">
             <Stack.Screen
@@ -265,12 +317,19 @@ export default function ExerciseScreen() {
                     <Tip
                         title={"Sessions"}
                         text1={
-                            "When you log your first exercise of the day, your session begins. To save your workout logs for the day, head to the home page and end the session once you're done."
+                            "When you log your first exercise of the day, your session begins. To save your workout logs for the day, make sure to finish the session once you're done."
                         }
                         text2={undefined}
                     />
                 </View>
             )}
+
+            <View>
+                {/* <Text>workout_session STATUS: {workoutSession[0].}</Text> */}
+                <Text>Volume {progress.Volume}kg</Text>
+                <Text>kg/reps {progress.kgPerRep}%</Text>
+                <Text>Reps {progress.totalReps}</Text>
+            </View>
 
             <FlatList
                 data={workoutSession}
