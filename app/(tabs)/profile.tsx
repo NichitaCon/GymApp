@@ -106,7 +106,12 @@ export default function Profile() {
             {/* <Header header={"Profile"} back={false} /> */}
             <View className="flex-row justify-between mb-8">
                 <View>
-                    <Text className="text-4xl">{fullName}</Text>
+                    {fullName ? (
+                        <Text className="text-4xl">{fullName}</Text>
+                    ) : (
+                        <Text className="text-4xl">{username}</Text>
+                    )}
+                    
                     <Text className=" text-gray-500">Role: {role}</Text>
                 </View>
                 <Link href={`/profile/profileSettings`} asChild>

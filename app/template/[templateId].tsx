@@ -8,6 +8,7 @@ import {
     FlatList,
     Modal,
     TextInput,
+    Alert,
 } from "react-native";
 
 import { supabase } from "~/utils/supabase";
@@ -24,7 +25,7 @@ import { DeleteButton } from "~/components/DeleteButton";
 
 export default function RoutinePage() {
     const { templateId } = useLocalSearchParams();
-    const [template, setTemplate] = useState([]);
+    const [template, setTemplate] = useState({});
     const [templateExercise, setTemplateExercise] = useState([]);
     const [DeleteModalVisible, setDeleteModalVisible] = useState(false);
     const [userRole, setUserRole] = useState("User");
@@ -92,7 +93,7 @@ export default function RoutinePage() {
         } else {
             console.log("profile role from profiles = ", data);
         }
-        setUserRole(data);
+        setUserRole(data.role);
     };
     const insertWorkoutTemplate = async () => {
         console.log("Creating routine...");
@@ -146,6 +147,13 @@ export default function RoutinePage() {
     };
 
     const deleteTemplate = async () => {
+        if (user.id !== template.creator_id || userRole !== "Admin") {
+            Alert.alert(
+                "You are not authorized to delete this template.",
+            );
+            return
+        }
+
         const { error } = await supabase
             .from("templates")
             .delete()
@@ -171,6 +179,8 @@ export default function RoutinePage() {
     }
 
     console.log("this userRole is = ", userRole);
+    console.log("this template is = ", template);
+
 
     return (
         <View className="flex-1 p-4 gap-3 bg-white">
@@ -183,13 +193,17 @@ export default function RoutinePage() {
                         <Header
                             header="Template"
                             back={true}
-                            rightButtons={[
-                                {
-                                    component: <DeleteButton />,
-                                    onPress: () =>
-                                        setDeleteModalVisible(true),
-                                },
-                            ]}
+                            rightButtons={
+                                (user.id === template.user_id || userRole === "Admin")
+                                    ? [
+                                        {
+                                            component: <DeleteButton />,
+                                            onPress: () =>
+                                                setDeleteModalVisible(true),
+                                        },
+                                    ]
+                                    : []
+                            }
                         />
                         // Add extra buttons/components here if you want
                     ),

@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "GymApp",
-    "slug": "GymApp",
+    "name": "SteelSet",
+    "slug": "SteelSet",
     "version": "1.0.0",
 
-    "scheme": "GymApp",
+    "scheme": "SteelSet",
     "web": {
       "bundler": "metro",
       "output": "static",

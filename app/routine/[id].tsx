@@ -30,6 +30,7 @@ export default function RoutinePage() {
     }, [updated]);
     const [routine, setRoutine] = useState(null);
     const [exercise, setExercise] = useState(null);
+    const [userRole, setUserRole] = useState(null);
 
     const [routineExercise, setRoutineExercise] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -58,6 +59,21 @@ export default function RoutinePage() {
     //     fetchExercise();
     //     console.log("useEffect Triggered in: [id]2.tsx");
     // }, []);
+
+    const fetchUserRole = async () => {
+        const { data, error } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .single();
+
+        if (error) {
+            console.error("Error fetching user role:", error);
+            return;
+        }
+
+        setUserRole(data.role);
+    }
 
     const fetchRoutine = async () => {
         setLoading(true);
@@ -214,7 +230,7 @@ export default function RoutinePage() {
                     </Text>
                 </Pressable>
             </Link>
-            {routine.template_id === null ? (
+            {userRole !== "Guest user" && routine.template_id === null ? (
                 exercise &&
                 exercise.length > 0 && (
                     <Pressable onPress={() => insertTemplateRoutine()}>

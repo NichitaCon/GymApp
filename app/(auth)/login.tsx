@@ -43,80 +43,40 @@ export default function Auth() {
         setLoading(false);
     }
 
-    async function signUpWithEmail() {
-        setLoading(true);
-
-        if (!email) {
-            setLoading(false);
-            return Alert.alert("email required :P");
-        } else if (!name) {
-            setLoading(false);
-            return Alert.alert("name required :P");
-        }
-
-        // Step 1: Create a new account
-        const { data: signUpData, error: signUpError } =
-            await supabase.auth.signUp({
-                email: email,
-                password: password,
-            });
-
-        if (signUpError) {
-            Alert.alert(signUpError.message);
-            setLoading(false);
-            return;
-        }
-
-        // Step 2: Get the user ID from the signed-up session
-        const userId = signUpData?.user?.id;
-        if (!userId) {
-            Alert.alert("User ID not found after sign-up.");
-            setLoading(false);
-            return;
-        }
-
-        // Step 3: Update the existing profile instead of inserting a new one
-        const { error: profileError } = await supabase
-            .from("profiles")
-            .update({ full_name: name })
-            .eq("id", userId);
-
-        if (profileError) {
-            Alert.alert(profileError.message);
-        } else {
-            // Alert.alert("Sign-up successful! Check your email for verification.");
-        }
-
-        setLoading(false);
-    }
-
     return (
         <View className="flex-1 gap-3 p-5 pt-10 bg-white">
-            <Stack.Screen options={{ title: "Log in" }} />
+            <Stack.Screen
+                options={{
+                    title: "Log in",
+                    header: () => <Header back={true} header={"Log in"} />,
+                }}
+            />
 
-            <Header header={"Log in"}/>
+            {/* <Header header={"Log in"}/> */}
 
             {/* <Text className="text-4xl">Welcome to my app!</Text> */}
             <View className="gap-1">
-                <Text className="text-2xl">Email:</Text>
+                {/* <Text className="text-2xl">Email:</Text> */}
                 <TextInput
                     onChangeText={(text) => setEmail(text)}
                     value={email}
-                    placeholder="email@address.com"
+                    placeholder="Email"
+                    placeholderTextColor="#c4c4c4"
                     autoCapitalize={"none"}
-                    className=" p-4 bg-gray-200 rounded-md"
+                    className=" p-4 border-gray-300 border-2 rounded-md"
                 />
             </View>
 
             <View>
-                <Text className="text-2xl">Password:</Text>
+                {/* <Text className="text-2xl">Password:</Text> */}
                 <TextInput
                     onChangeText={(text) => setPassword(text)}
                     value={password}
                     secureTextEntry={true}
                     placeholder="Password"
+                    placeholderTextColor="#c4c4c4"
                     autoCapitalize={"none"}
-                    className="p-4 bg-gray-200 rounded-md"
+                    className=" p-4 border-gray-300 border-2 rounded-md"
                 />
             </View>
 
@@ -124,9 +84,9 @@ export default function Auth() {
                 <Pressable
                     onPress={() => signInWithEmail()}
                     disabled={loading}
-                    className="p-4 flex-1 border border-gray-400 rounded-md items-center"
+                    className="p-4 flex-1 bg-blue-300 rounded-md items-center"
                 >
-                    <Text className="font-bold text-gray-600 text-lg">
+                    <Text className="font-bold text-gray-700 text-lg">
                         Log in
                     </Text>
                 </Pressable>
