@@ -11,6 +11,14 @@ export default function Profile() {
     const [loading, setLoading] = useState(true);
     const [username, setUsername] = useState("");
     const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
+    const [OTCcode, setOTCCode] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+
+    const passwordMatchBool = password === confirmPassword;
+
+    const [OTCsent, setOTCsent] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState("");
     const [role, setRole] = useState("");
 
@@ -82,6 +90,43 @@ export default function Profile() {
             setLoading(false);
         }
     }
+
+    const linkAccount = async () => {
+        console.log("Linking account...");
+        const { data: updateEmailData, error: updateEmailError } =
+            await supabase.auth.updateUser({
+                email: email,
+            });
+
+        if (updateEmailError) {
+            console.error("Error linking account:", updateEmailError);
+            Alert.alert("Error linking account", updateEmailError.message);
+            return;
+        }
+
+        setOTCsent(true);
+        Alert.alert(
+            "Confirmation email sent",
+            "Please check your email to confirm account creation!",
+        );
+    };
+
+    const verifyOTC = async () => {
+        console.log("Verifying OTC code...");
+        const { data, error } = await supabase.auth.verifyOtp({
+            email: email,
+            token: OTCcode, // The OTP entered by the user
+            type: "email",
+        });
+
+        if (error) {
+            console.error("Error verifying OTC code:", error);
+            Alert.alert("Error verifying code", error.message);
+            return;
+        }
+        Alert.alert("Account linked successfully!");
+    };
+
     return (
         <View className="flex-1 bg-white p-5 gap-3">
             <Stack.Screen
@@ -127,19 +172,7 @@ export default function Profile() {
             /> */}
 
             <View className="flex-row justify-between ">
-                <Pressable
-                    className="p-4  border-2 border-gray-400 rounded-md items-center w-1/3"
-                    onPress={() => {
-                        supabase.auth.signOut();
-                        router.replace("/(auth)/login");
-                    }}
-                >
-                    <Text className="font-bold text-black text-lg">
-                        Sign out
-                    </Text>
-                </Pressable>
-
-                {role !== "Guest user" && (
+                {role !== "Guest user" ? (
                     <Pressable
                         onPress={() => {
                             updateProfile({
@@ -159,10 +192,127 @@ export default function Profile() {
                         disabled={loading}
                         className="p-4  bg-blue-400 rounded-md items-center w-1/3"
                     >
+                        <Pressable
+                            className="p-4  border-2 border-gray-400 rounded-md items-center w-1/3"
+                            onPress={() => {
+                                supabase.auth.signOut();
+                                router.replace("/(auth)/login");
+                            }}
+                        >
+                            <Text className="font-bold text-black text-lg">
+                                Sign out
+                            </Text>
+                        </Pressable>
                         <Text className="font-bold text-white text-lg">
                             Save
                         </Text>
                     </Pressable>
+                ) : (
+                    <View>
+                        <Text>You are a guest user!</Text>
+                        <Text>Please Link you an account to sign out</Text>
+
+                        <View className="gap-1">
+                            {/* <Text className="text-2xl">Email:</Text> */}
+                            <TextInput
+                                onChangeText={(text) => setEmail(text)}
+                                value={email}
+                                placeholder="Email"
+                                placeholderTextColor="#c4c4c4"
+                                autoCapitalize={"none"}
+                                className=" p-4 border-gray-300 border-2 rounded-md"
+                            />
+
+                            <TextInput
+                                onChangeText={(text) => setPassword(text)}
+                                value={password}
+                                secureTextEntry={true}
+                                placeholder="Password"
+                                placeholderTextColor="#c4c4c4"
+                                autoCapitalize={"none"}
+                                className=" p-4 border-gray-300 border-2 rounded-md"
+                            />
+
+                            <TextInput
+                                onChangeText={(text) => setConfirmPassword(text)}
+                                value={confirmPassword}
+                                secureTextEntry={true}
+                                placeholder="Confirm password"
+                                placeholderTextColor="#c4c4c4"
+                                autoCapitalize={"none"}
+                                className=" p-4 border-gray-300 border-2 rounded-md"
+                            />
+
+                            {!passwordMatchBool && password.length > 0 && (
+                                <Text className="text-red-500">passowords do not match! :( </Text>
+                            )}
+
+
+                        </View>
+
+                        {OTCsent ? (
+                            <View>
+                                <Text>
+                                    Confirmation email sent!, please enter 6
+                                    digit code below
+                                </Text>
+                                <TextInput
+                                    onChangeText={(text) => setOTCCode(text)}
+                                    value={OTCcode}
+                                    placeholder="Enter 6 digit code"
+                                    placeholderTextColor="#c4c4c4"
+                                    autoCapitalize={"none"}
+                                    className=" p-4 border-gray-300 border-2 rounded-md"
+                                />
+                                <Pressable
+                                    onPress={() => verifyOTC()}
+                                    disabled={loading}
+                                    className="p-4 flex-1 bg-blue-300 rounded-md items-center"
+                                >
+                                    <Text className="font-bold text-red-700 text-lg">
+                                        Confirm 6 digit co
+                                    </Text>
+                                </Pressable>
+                            </View>
+                        ) : (
+                            <View className="flex-row">
+                                <Pressable
+                                    onPress={() => linkAccount()}
+                                    disabled={loading}
+                                    className="p-4 flex-1 bg-blue-300 rounded-md items-center"
+                                >
+                                    <Text className="font-bold text-gray-700 text-lg">
+                                        Link acc
+                                    </Text>
+                                </Pressable>
+                            </View>
+                        )}
+
+                        <View>
+                            {/* <Text className="text-2xl">Password:</Text> */}
+                            {/* <TextInput
+                                onChangeText={(text) => setPassword(text)}
+                                value={password}
+                                secureTextEntry={true}
+                                placeholder="Password"
+                                placeholderTextColor="#c4c4c4"
+                                autoCapitalize={"none"}
+                                className=" p-4 border-gray-300 border-2 rounded-md"
+                            /> */}
+                        </View>
+
+                        {/* <View className="flex-row">
+                            <Pressable
+                                onPress={() => linkAccount()}
+                                disabled={loading}
+                                className="p-4 flex-1 bg-blue-300 rounded-md items-center"
+                            >
+                                <Text className="font-bold text-gray-700 text-lg">
+                                    Link account
+                                </Text>
+                            </Pressable>
+                        </View> */}
+                    </View>
                 )}
             </View>
         </View>

@@ -95,6 +95,7 @@ export default function RoutinePage() {
         }
         setUserRole(data.role);
     };
+
     const insertWorkoutTemplate = async () => {
         console.log("Creating routine...");
 
@@ -148,10 +149,8 @@ export default function RoutinePage() {
 
     const deleteTemplate = async () => {
         if (user.id !== template.creator_id || userRole !== "Admin") {
-            Alert.alert(
-                "You are not authorized to delete this template.",
-            );
-            return
+            Alert.alert("You are not authorized to delete this template.");
+            return;
         }
 
         const { error } = await supabase
@@ -181,7 +180,6 @@ export default function RoutinePage() {
     console.log("this userRole is = ", userRole);
     console.log("this template is = ", template);
 
-
     return (
         <View className="flex-1 p-4 gap-3 bg-white">
             <Stack.Screen
@@ -194,14 +192,15 @@ export default function RoutinePage() {
                             header="Template"
                             back={true}
                             rightButtons={
-                                (user.id === template.user_id || userRole === "Admin")
+                                user.id === template.user_id ||
+                                userRole === "Admin"
                                     ? [
-                                        {
-                                            component: <DeleteButton />,
-                                            onPress: () =>
-                                                setDeleteModalVisible(true),
-                                        },
-                                    ]
+                                          {
+                                              component: <DeleteButton />,
+                                              onPress: () =>
+                                                  setDeleteModalVisible(true),
+                                          },
+                                      ]
                                     : []
                             }
                         />
