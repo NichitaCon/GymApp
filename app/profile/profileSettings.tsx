@@ -111,7 +111,7 @@ export default function Profile() {
         );
     };
 
-    const verifyOTC = async () => {
+    const verifyEmailOtpAndSetPassword = async () => {
         console.log("Verifying OTC code...");
         const { data, error } = await supabase.auth.verifyOtp({
             email: email,
@@ -124,7 +124,19 @@ export default function Profile() {
             Alert.alert("Error verifying code", error.message);
             return;
         }
-        Alert.alert("Account linked successfully!");
+
+        const { data: updatePasswordData, error: updatePasswordError } =
+            await supabase.auth.updateUser({
+                password: password,
+            });
+
+        if (updatePasswordError) {
+            console.error("Password update error:", updatePasswordError);
+            Alert.alert("Password creation error, Please try again.");
+            return;
+        }
+
+        Alert.alert("Account created successfully!");
     };
 
     return (
@@ -171,27 +183,32 @@ export default function Profile() {
                 className="border p-3 border-gray-400 rounded-md"
             /> */}
 
-            <View className="flex-row justify-between ">
+            <View className="flex-row justify-between">
                 {role !== "Guest user" ? (
-                    <Pressable
-                        onPress={() => {
-                            updateProfile({
-                                username,
-                                avatar_url: avatarUrl,
-                                full_name: fullName,
-                            });
-                            router.push({
-                                pathname: "/(tabs)/profile",
-                                params: {
-                                    username: username,
-                                    full_name: fullName,
+                    <View>
+                        <Pressable
+                            onPress={() => {
+                                updateProfile({
+                                    username,
                                     avatar_url: avatarUrl,
-                                },
-                            });
-                        }}
-                        disabled={loading}
-                        className="p-4  bg-blue-400 rounded-md items-center w-1/3"
-                    >
+                                    full_name: fullName,
+                                });
+                                router.push({
+                                    pathname: "/(tabs)/profile",
+                                    params: {
+                                        username: username,
+                                        full_name: fullName,
+                                        avatar_url: avatarUrl,
+                                    },
+                                });
+                            }}
+                            disabled={loading}
+                            className="p-4  bg-blue-400 rounded-md items-center w-1/3"
+                        >
+                            <Text className="font-bold text-white text-lg">
+                                Save
+                            </Text>
+                        </Pressable>
                         <Pressable
                             className="p-4  border-2 border-gray-400 rounded-md items-center w-1/3"
                             onPress={() => {
@@ -203,115 +220,115 @@ export default function Profile() {
                                 Sign out
                             </Text>
                         </Pressable>
-                        <Text className="font-bold text-white text-lg">
-                            Save
-                        </Text>
-                    </Pressable>
+                    </View>
                 ) : (
-                    <View>
-                        <Text>You are a guest user!</Text>
-                        <Text>Please Link you an account to sign out</Text>
+                    <View className="w-full flex-1">
+                        <Text className="text-3xl">You are a guest user!</Text>
+                        <Text className="mb-4">
+                            Please create an account to sign out and save your
+                            progress
+                        </Text>
 
-                        <View className="gap-1">
-                            {/* <Text className="text-2xl">Email:</Text> */}
+                        <View className="gap-2">
                             <TextInput
                                 onChangeText={(text) => setEmail(text)}
                                 value={email}
                                 placeholder="Email"
                                 placeholderTextColor="#c4c4c4"
-                                autoCapitalize={"none"}
+                                autoCapitalize="none"
+                                keyboardType="email-address"
+                                autoComplete="email"
+                                textContentType="emailAddress"
                                 className=" p-4 border-gray-300 border-2 rounded-md"
                             />
-
                             <TextInput
                                 onChangeText={(text) => setPassword(text)}
                                 value={password}
                                 secureTextEntry={true}
                                 placeholder="Password"
                                 placeholderTextColor="#c4c4c4"
-                                autoCapitalize={"none"}
+                                autoCapitalize="none"
                                 className=" p-4 border-gray-300 border-2 rounded-md"
                             />
-
                             <TextInput
                                 onChangeText={(text) => setConfirmPassword(text)}
                                 value={confirmPassword}
                                 secureTextEntry={true}
                                 placeholder="Confirm password"
                                 placeholderTextColor="#c4c4c4"
-                                autoCapitalize={"none"}
+                                autoCapitalize="none"
                                 className=" p-4 border-gray-300 border-2 rounded-md"
                             />
 
                             {!passwordMatchBool && password.length > 0 && (
-                                <Text className="text-red-500">passowords do not match! :( </Text>
+                                <Text className="text-red-500">
+                                    passowords do not match! :({" "}
+                                </Text>
                             )}
+                            {/* OTCsent can be looked at as the bottom buttons, including the otc check textinput */}
 
-
-                        </View>
-
-                        {OTCsent ? (
-                            <View>
-                                <Text>
-                                    Confirmation email sent!, please enter 6
-                                    digit code below
-                                </Text>
-                                <TextInput
-                                    onChangeText={(text) => setOTCCode(text)}
-                                    value={OTCcode}
-                                    placeholder="Enter 6 digit code"
-                                    placeholderTextColor="#c4c4c4"
-                                    autoCapitalize={"none"}
-                                    className=" p-4 border-gray-300 border-2 rounded-md"
-                                />
-                                <Pressable
-                                    onPress={() => verifyOTC()}
-                                    disabled={loading}
-                                    className="p-4 flex-1 bg-blue-300 rounded-md items-center"
-                                >
-                                    <Text className="font-bold text-red-700 text-lg">
-                                        Confirm 6 digit co
+                            {OTCsent ? (
+                                <View className="gap-2">
+                                    <Text>
+                                        Confirmation email sent!, please enter 6
+                                        digit code below
                                     </Text>
-                                </Pressable>
-                            </View>
-                        ) : (
-                            <View className="flex-row">
-                                <Pressable
-                                    onPress={() => linkAccount()}
-                                    disabled={loading}
-                                    className="p-4 flex-1 bg-blue-300 rounded-md items-center"
-                                >
-                                    <Text className="font-bold text-gray-700 text-lg">
-                                        Link acc
-                                    </Text>
-                                </Pressable>
-                            </View>
-                        )}
-
-                        <View>
-                            {/* <Text className="text-2xl">Password:</Text> */}
-                            {/* <TextInput
-                                onChangeText={(text) => setPassword(text)}
-                                value={password}
-                                secureTextEntry={true}
-                                placeholder="Password"
-                                placeholderTextColor="#c4c4c4"
-                                autoCapitalize={"none"}
-                                className=" p-4 border-gray-300 border-2 rounded-md"
-                            /> */}
+                                    <TextInput
+                                        onChangeText={(text) => {
+                                            // Only allow whole numbers (no decimals)
+                                            const numericText = text.replace(/[^0-9]/g, "");
+                                            setOTCCode(numericText);
+                                        }}
+                                        value={OTCcode}
+                                        placeholder="Enter 6 digit code"
+                                        placeholderTextColor="#c4c4c4"
+                                        autoCapitalize={"none"}
+                                        keyboardType="numeric"
+                                        className=" p-4 border-gray-300 border-2 rounded-md"
+                                    />
+                                    <Pressable
+                                        onPress={() =>
+                                            verifyEmailOtpAndSetPassword()
+                                        }
+                                        disabled={loading}
+                                        className="p-4 bg-red-300 rounded-md items-center"
+                                    >
+                                        <Text className="font-bold text-red-700 text-lg">
+                                            Confirm 6 digit code
+                                        </Text>
+                                    </Pressable>
+                                </View>
+                            ) : (
+                                <View className="flex-row">
+                                    {passwordMatchBool &&
+                                    password.length >= 8 ? (
+                                        <Pressable
+                                            onPress={() => linkAccount()}
+                                            disabled={loading}
+                                            className="p-4 flex-1 bg-blue-300 rounded-md items-center"
+                                        >
+                                            <Text className="font-bold text-gray-700 text-lg">
+                                                Link account
+                                            </Text>
+                                        </Pressable>
+                                    ) : (
+                                        <Pressable
+                                            onPress={() =>
+                                                Alert.alert(
+                                                    "password must be at least 8 characters",
+                                                    "and matching*-",
+                                                )
+                                            }
+                                            className="p-4 flex-1 bg-gray-300 rounded-md items-center"
+                                        >
+                                            <Text className="font-bold text-gray-500 text-lg">
+                                                Link account
+                                            </Text>
+                                        </Pressable>
+                                    )}
+                                </View>
+                            )}
                         </View>
-
-                        {/* <View className="flex-row">
-                            <Pressable
-                                onPress={() => linkAccount()}
-                                disabled={loading}
-                                className="p-4 flex-1 bg-blue-300 rounded-md items-center"
-                            >
-                                <Text className="font-bold text-gray-700 text-lg">
-                                    Link account
-                                </Text>
-                            </Pressable>
-                        </View> */}
                     </View>
                 )}
             </View>
