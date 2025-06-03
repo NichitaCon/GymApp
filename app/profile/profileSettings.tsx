@@ -2,6 +2,7 @@ import { router, Stack } from "expo-router";
 import React from "react";
 import { useEffect, useState } from "react";
 import { Alert, Button, Pressable, Text, TextInput, View } from "react-native";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import Header from "~/components/Header";
 import { useAuth } from "~/contexts/AuthProvider";
 
@@ -12,7 +13,6 @@ export default function Profile() {
     const [username, setUsername] = useState("");
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
-    const [OTCcode, setOTCCode] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -111,17 +111,19 @@ export default function Profile() {
         );
     };
 
-    const verifyEmailOtpAndSetPassword = async () => {
-        console.log("Verifying OTC code...");
-        const { data, error } = await supabase.auth.verifyOtp({
-            email: email,
-            token: OTCcode, // The OTP entered by the user
-            type: "email",
-        });
+    const handleSetPassword = async () => {
+        console.log("Setting password...");
 
-        if (error) {
-            console.error("Error verifying OTC code:", error);
-            Alert.alert("Error verifying code", error.message);
+        if (!passwordMatchBool) {
+            console.error("Passwords do not match");
+            Alert.alert("Passwords do not match", "Please try again.");
+            return;
+        } else if (password.length < 8) {
+            console.error("Password must be at least 8 characters long");
+            Alert.alert(
+                "Password too short",
+                "Password must be at least 8 characters long.",
+            );
             return;
         }
 
@@ -132,9 +134,39 @@ export default function Profile() {
 
         if (updatePasswordError) {
             console.error("Password update error:", updatePasswordError);
-            Alert.alert("Password creation error, Please try again.");
+            if (
+                updatePasswordError.message.includes(
+                    "Updating password of an anonymous user without an email or phone is not allowed",
+                )
+            ) {
+                Alert.alert(
+                    "Password creation error",
+                    "You must link your account first, please try again after clicking the link in the email sent to you.",
+                );
+            } else {
+                Alert.alert(
+                    "Password creation error, Please try again.",
+                    updatePasswordError.message,
+                );
+            }
             return;
         }
+
+        const { data: updateProfileData, error: updateProfileError } =
+            await supabase
+                .from("profiles")
+                .update({ role: "User" })
+                .eq("id", session.user.id);
+
+        if (updateProfileError) {
+            console.error("Profile update error:", updateProfileError);
+            Alert.alert("Profile update error", "Please try again.");
+            return;
+        }
+
+        getProfile(); // Refresh profile data after updating
+
+        console.log("Account created successfully!");
 
         Alert.alert("Account created successfully!");
     };
@@ -153,39 +185,28 @@ export default function Profile() {
                 }}
             />
 
-            {role !== "Guest user" && (
-                <View>
-                    <Text className="text-3xl">Edit Account:</Text>
-                    <Text className="text-xl">Email:</Text>
-                    <TextInput
-                        editable={false}
-                        value={session.user.email}
-                        placeholder="email"
-                        autoCapitalize={"none"}
-                        className="border p-3 border-gray-400 rounded-md text-gray-500"
-                    />
-                    <Text className="text-xl">Name:</Text>
-                    <TextInput
-                        onChangeText={(text) => setFullName(text)}
-                        value={fullName}
-                        placeholder="full name"
-                        autoCapitalize={"none"}
-                        className="border p-3 border-gray-400 rounded-md"
-                    />
-                </View>
-            )}
-
-            {/* <TextInput
-                onChangeText={(text) => setUsername(text)}
-                value={username}
-                placeholder="username"
-                autoCapitalize={"none"}
-                className="border p-3 border-gray-400 rounded-md"
-            /> */}
+            {/* if role is not a guest user, present regular settings */}
 
             <View className="flex-row justify-between">
                 {role !== "Guest user" ? (
-                    <View>
+                    <View className="w-full flex-1 gap-4">
+                        <Text className="text-3xl">Edit Account:</Text>
+                        <Text className="text-xl">Email:</Text>
+                        <TextInput
+                            editable={false}
+                            value={session.user.email}
+                            placeholder="email"
+                            autoCapitalize={"none"}
+                            className="border p-3 border-gray-400 rounded-md text-gray-500"
+                        />
+                        <Text className="text-xl">Name:</Text>
+                        <TextInput
+                            onChangeText={(text) => setFullName(text)}
+                            value={fullName}
+                            placeholder="full name"
+                            autoCapitalize={"none"}
+                            className="border p-3 border-gray-400 rounded-md"
+                        />
                         <Pressable
                             onPress={() => {
                                 updateProfile({
@@ -222,6 +243,7 @@ export default function Profile() {
                         </Pressable>
                     </View>
                 ) : (
+                    // If the user is a guest, show the guest account creation form
                     <View className="w-full flex-1">
                         <Text className="text-3xl">You are a guest user!</Text>
                         <Text className="mb-4">
@@ -251,7 +273,9 @@ export default function Profile() {
                                 className=" p-4 border-gray-300 border-2 rounded-md"
                             />
                             <TextInput
-                                onChangeText={(text) => setConfirmPassword(text)}
+                                onChangeText={(text) =>
+                                    setConfirmPassword(text)
+                                }
                                 value={confirmPassword}
                                 secureTextEntry={true}
                                 placeholder="Confirm password"
@@ -270,10 +294,14 @@ export default function Profile() {
                             {OTCsent ? (
                                 <View className="gap-2">
                                     <Text>
-                                        Confirmation email sent!, please enter 6
-                                        digit code below
+                                        A confirmation email has been sent.
                                     </Text>
-                                    <TextInput
+                                    <Text>
+                                        Please check your email, click the
+                                        confirmation link, and then return to
+                                        the app to complete your account.
+                                    </Text>
+                                    {/* <TextInput
                                         onChangeText={(text) => {
                                             // Only allow whole numbers (no decimals)
                                             const numericText = text.replace(/[^0-9]/g, "");
@@ -285,16 +313,14 @@ export default function Profile() {
                                         autoCapitalize={"none"}
                                         keyboardType="numeric"
                                         className=" p-4 border-gray-300 border-2 rounded-md"
-                                    />
+                                    /> */}
                                     <Pressable
-                                        onPress={() =>
-                                            verifyEmailOtpAndSetPassword()
-                                        }
+                                        onPress={() => handleSetPassword()}
                                         disabled={loading}
                                         className="p-4 bg-red-300 rounded-md items-center"
                                     >
                                         <Text className="font-bold text-red-700 text-lg">
-                                            Confirm 6 digit code
+                                            Confirm account
                                         </Text>
                                     </Pressable>
                                 </View>
