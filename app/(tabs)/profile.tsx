@@ -38,13 +38,13 @@ export default function Profile() {
     useEffect(() => {
         fetchTemplates();
         if (session) getProfile();
-    }, [params]);
+    }, []);
 
     useFocusEffect(
         useCallback(() => {
             fetchTemplates();
             if (session) getProfile();
-            console.log("usefocus effect called in id.tsx!");
+            // console.log("usefocus effect called in id.tsx!");
         }, []),
     );
 

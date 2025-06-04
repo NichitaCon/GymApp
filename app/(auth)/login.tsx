@@ -63,6 +63,7 @@ export default function Auth() {
                     placeholder="Email"
                     placeholderTextColor="#c4c4c4"
                     autoCapitalize={"none"}
+                    keyboardType="email-address"
                     className=" p-4 border-gray-300 border-2 rounded-md"
                 />
             </View>

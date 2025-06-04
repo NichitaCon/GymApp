@@ -189,58 +189,35 @@ export default function Profile() {
 
             <View className="flex-row justify-between">
                 {role !== "Guest user" ? (
-                    <View className="w-full flex-1 gap-4">
-                        <Text className="text-3xl">Edit Account:</Text>
-                        <Text className="text-xl">Email:</Text>
-                        <TextInput
-                            editable={false}
-                            value={session.user.email}
-                            placeholder="email"
-                            autoCapitalize={"none"}
-                            className="border p-3 border-gray-400 rounded-md text-gray-500"
-                        />
-                        <Text className="text-xl">Name:</Text>
-                        <TextInput
-                            onChangeText={(text) => setFullName(text)}
-                            value={fullName}
-                            placeholder="full name"
-                            autoCapitalize={"none"}
-                            className="border p-3 border-gray-400 rounded-md"
-                        />
-                        <Pressable
-                            onPress={() => {
-                                updateProfile({
-                                    username,
-                                    avatar_url: avatarUrl,
-                                    full_name: fullName,
-                                });
-                                router.push({
-                                    pathname: "/(tabs)/profile",
-                                    params: {
-                                        username: username,
-                                        full_name: fullName,
-                                        avatar_url: avatarUrl,
-                                    },
-                                });
-                            }}
-                            disabled={loading}
-                            className="p-4  bg-blue-400 rounded-md items-center w-1/3"
-                        >
-                            <Text className="font-bold text-white text-lg">
-                                Save
-                            </Text>
-                        </Pressable>
-                        <Pressable
-                            className="p-4  border-2 border-gray-400 rounded-md items-center w-1/3"
-                            onPress={() => {
-                                supabase.auth.signOut();
-                                router.replace("/(auth)/login");
-                            }}
-                        >
-                            <Text className="font-bold text-black text-lg">
-                                Sign out
-                            </Text>
-                        </Pressable>
+                    <View className="flex-1">
+                        <Text className="text-4xl mb-2 text-gray-900">
+                            Account
+                        </Text>
+
+                        <View className="bg-gray-100 gap-2 p-3 rounded-3xl">
+                            <Pressable
+                                onPress={() =>
+                                    router.push(
+                                        "/profile/profileSettings/editAccount",
+                                    )
+                                }
+                            >
+                                <Text className="text-2xl p-1 text-gray-800">
+                                    Edit account
+                                </Text>
+                            </Pressable>
+                            <View className="bg-red border rounded-full border-gray-300"></View>
+                            <Pressable
+                                onPress={() => {
+                                    supabase.auth.signOut();
+                                    router.replace("/(auth)/login");
+                                }}
+                            >
+                                <Text className="text-2xl p-1 text-gray-800">
+                                    Sign out
+                                </Text>
+                            </Pressable>
+                        </View>
                     </View>
                 ) : (
                     // If the user is a guest, show the guest account creation form

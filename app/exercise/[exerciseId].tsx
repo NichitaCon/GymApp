@@ -229,55 +229,88 @@ export default function ExerciseScreen() {
     };
 
     const getSessionTotals = (session) => {
-        if (!session) return { totalWeight: 0, totalReps: 0 }
+        if (!session)
+            return {
+                totalVolume: 0,
+                totalWeight: 0,
+                totalReps: 0,
+                averageWeight: 0,
+                totalSets: 0,
+            };
+
+        let totalVolume = 0;
         let totalWeight = 0;
         let totalReps = 0;
+        let totalSets = session.set_logs.length;
 
         session.set_logs.forEach((setLog) => {
-            totalWeight += setLog.weight
-            totalReps += setLog.reps
-        })
+            totalReps += setLog.reps;
+            totalWeight += setLog.weight;
+            totalVolume += setLog.weight * setLog.reps; // Volume = weight × reps
+        });
 
-        return { totalWeight, totalReps };
-    }
-    
+        const averageWeight = totalWeight / totalSets;
+
+        return {
+            totalSets,
+            totalWeight,
+            totalReps,
+            averageWeight,
+            totalVolume,
+        };
+    };
+
     // Define progress with default values
     let progress = {
         totalWeight: 0,
         totalReps: 0,
+        totalRepsDiff: 0,
+        averageWeight: 0,
         kgPerRep: 0,
-        Volume: 0,
+        volume: 0,
         repDiff: 0,
         kgPerRepDiff: 0,
-        VolumeDiff: 0,
+        volumeDiff: 0,
     };
 
     if (workoutSession.length >= 2) {
-        let currentSession = getSessionTotals(workoutSession[0]);
-        let previousSession = getSessionTotals(workoutSession[1]);
+        const currentSession = getSessionTotals(workoutSession[0]);
+        const previousSession = getSessionTotals(workoutSession[1]);
 
-        let kgPerRepDiffCurrent =
-            currentSession.totalReps > 0 && previousSession.totalReps > 0
-        
         progress = {
             totalWeight: currentSession.totalWeight,
             totalReps: currentSession.totalReps,
-            kgPerRep: currentSession.totalReps > 0 ? currentSession.totalWeight / currentSession.totalReps : 0,
-            Volume: currentSession.totalWeight,
+            totalRepsDiff: currentSession.totalReps - previousSession.totalReps,
+            averageWeight: currentSession.averageWeight,
+            kgPerRep:
+                currentSession.totalReps > 0
+                    ? +(
+                          currentSession.totalVolume / currentSession.totalReps
+                      ).toFixed(2)
+                    : 0,
+            volume: currentSession.totalVolume,
             repDiff: currentSession.totalReps - previousSession.totalReps,
-            kgPerRepDiff: 
-            currentSession.totalReps > 0 && previousSession.totalReps > 0
-            ? currentSession.totalWeight / currentSession.totalReps -
-              previousSession.totalWeight / previousSession.totalReps
-            : 0,
-            VolumeDiff: currentSession.totalWeight - previousSession.totalWeight,
+            kgPerRepDiff:
+                currentSession.totalReps > 0 && previousSession.totalReps > 0
+                    ? Number(
+                          (
+                              currentSession.totalVolume /
+                                  currentSession.totalReps -
+                              previousSession.totalVolume /
+                                  previousSession.totalReps
+                          ).toFixed(1),
+                      )
+                    : 0,
+            volumeDiff:
+                currentSession.totalVolume - previousSession.totalVolume,
         };
-        console.log("Progress: ", progress);
-    }
-        
-    console.log("first session kg total:", getSessionTotals(workoutSession[0]).totalWeight)
 
-    console.log("workoutSession:", JSON.stringify(workoutSession, null, 2));
+        console.log("Current session progress:", progress);
+    }
+
+    // console.log("first session kg total:", getSessionTotals(workoutSession[0]).totalWeight)
+
+    // console.log("workoutSession:", JSON.stringify(workoutSession, null, 2));
     // console.log("workoutSession[0]:", JSON.stringify(workoutSession[0], null, 2));
 
     return (
@@ -324,14 +357,77 @@ export default function ExerciseScreen() {
                 </View>
             )}
 
-            <View>
-                {/* <Text>workout_session STATUS: {workoutSession[0].}</Text> */}
-                <Text>Volume {progress.Volume}kg</Text>
-                <Text>kg/reps {progress.kgPerRep}%</Text>
-                <Text>Reps {progress.totalReps}</Text>
-            </View>
-
             <FlatList
+                ListHeaderComponent={
+                    workoutSession.length > 0 ? (
+                        <View className="rounded-xl px-5 pb-5 pt-3 bg-gray-100">
+                            <Text className="text-center mb-2 text-2xl font-semibold">
+                                Compared to Previous
+                            </Text>
+                            <View className="flex-row justify-between">
+                                <View>
+                                    <Text className="text-xl font-semibold">
+                                        Reps
+                                    </Text>
+                                    <Text className="text-lg text-gray-800">
+                                        {progress.totalReps}
+                                    </Text>
+                                    {progress.totalRepsDiff > 0 ? (
+                                        <Text className="text-green-600">
+                                            ▲ {progress.totalRepsDiff}
+                                        </Text>
+                                    ) : progress.totalRepsDiff < 0 ? (
+                                        <Text className="text-red-600">
+                                            ▼ {Math.abs(progress.totalRepsDiff)}
+                                        </Text>
+                                    ) : (
+                                        <Text className="text-gray-500">–</Text>
+                                    )}
+                                </View>
+
+                                <View>
+                                    <Text className="text-xl font-semibold">
+                                        Volume
+                                    </Text>
+                                    <Text className="text-lg text-gray-800">
+                                        {progress.volume}kg
+                                    </Text>
+                                    {progress.volumeDiff > 0 ? (
+                                        <Text className="text-green-600">
+                                            ▲ {progress.volumeDiff}kg
+                                        </Text>
+                                    ) : progress.volumeDiff < 0 ? (
+                                        <Text className="text-red-600">
+                                            ▼ {Math.abs(progress.volumeDiff)}kg
+                                        </Text>
+                                    ) : (
+                                        <Text className="text-gray-500">–</Text>
+                                    )}
+                                </View>
+
+                                <View>
+                                    <Text className="text-xl font-semibold">
+                                        Kg/Rep
+                                    </Text>
+                                    <Text className="text-lg text-gray-800">
+                                        {progress.kgPerRep}
+                                    </Text>
+                                    {progress.kgPerRepDiff > 0 ? (
+                                        <Text className="text-green-600">
+                                            ▲ {progress.kgPerRepDiff}
+                                        </Text>
+                                    ) : progress.kgPerRepDiff < 0 ? (
+                                        <Text className="text-red-600">
+                                            ▼ {Math.abs(progress.kgPerRepDiff)}
+                                        </Text>
+                                    ) : (
+                                        <Text className="text-gray-500">–</Text>
+                                    )}
+                                </View>
+                            </View>
+                        </View>
+                    ) : null
+                }
                 data={workoutSession}
                 renderItem={({ item }) => (
                     <View className="">
