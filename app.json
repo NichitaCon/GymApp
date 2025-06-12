@@ -4,7 +4,7 @@
     "slug": "SteelSet",
     "version": "1.0.0",
 
-    "scheme": "SteelSet",
+    "scheme": "steelset",
     "web": {
       "bundler": "metro",
       "output": "static",
