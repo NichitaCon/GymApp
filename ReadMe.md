@@ -51,7 +51,7 @@ yarn install
   SUPABASE_ANON_KEY=your_supabase_anon_key
   ```
 
-- (Optional) If your project uses a different environment config method, update accordingly.
+- Please email me at NichitaDev@gmail.com So i can send you the database schema for easy replication :)
 
 ### 4. Run the project
 
